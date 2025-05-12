@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(BROKER)
+  brokerId  String?
+  broker    Broker?  @relation(fields: [brokerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Broker {
+  id        String    @id @default(uuid())
+  name      String
+  users     User[]
+  companies Company[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  broker    Broker   @relation(fields: [brokerId], references: [id])
+  brokerId  String
+  plans     Plan[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Plan {
+  id          String       @id @default(uuid())
+  name        String
+  year        Int
+  type        PlanType
+  inputData   Json?
+  company     Company      @relation(fields: [companyId], references: [id])
+  companyId   String
+  evaluations Evaluation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Evaluation {
+  id           String              @id @default(uuid())
+  plan         Plan                @relation(fields: [planId], references: [id])
+  planId       String
+  method       DeterminationMethod
+  result       CreditabilityStatus
+  isCreditable Boolean
+  reasoning    String?
+  createdAt    DateTime            @default(now())
+}
+
+enum Role {
+  BROKER
+  ADMIN
+}
+
+enum CreditabilityStatus {
+  CREDITABLE
+  NON_CREDITABLE
+  UNKNOWN
+}
+
+enum DeterminationMethod {
+  SIMPLIFIED
+  ACTUARIAL
+}
+
+enum PlanType {
+  STANDARD
+  HIGH_DEDUCTIBLE
+}

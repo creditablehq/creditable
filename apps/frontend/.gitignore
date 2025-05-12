@@ -1,0 +1,44 @@
+# Node
+node_modules/
+.pnpm-debug.log
+dist/
+build/
+.env
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+.vite
+
+# Editor settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+prisma/migrations/
+
+# Logs
+logs
+*.log
+
+# Output
+out/
+
+# coverage
+coverage/
+*.lcov
+
+# Others
+*.local
