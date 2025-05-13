@@ -15,7 +15,7 @@ app.get('/', (_req, res) => {
   res.send('Creditable API is live!');
 });
 
-app.get('/ping', (_req, res) => {
+app.get('/api/ping', (_req, res) => {
   res.json({ message: 'pong 🏓 from backend' });
 });
 

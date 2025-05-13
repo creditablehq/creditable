@@ -1,3 +1,5 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 interface SignUpData {
   email: string;
   password: string;
@@ -6,7 +8,7 @@ interface SignUpData {
 }
 
 export async function signUp(data: SignUpData) {
-  const res = await fetch('/api/auth/signup', {
+  const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -28,7 +30,7 @@ interface LoginData {
 }
 
 export async function login(data: LoginData) {
-  const res = await fetch('/api/auth/login', {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
