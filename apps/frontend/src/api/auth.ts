@@ -8,7 +8,7 @@ interface SignUpData {
 }
 
 export async function signUp(data: SignUpData) {
-  const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+  const res = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
