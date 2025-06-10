@@ -13,6 +13,10 @@ module.exports = {
           100: 'hsl(var(--color-neutral-100))',
           900: 'hsl(var(--color-neutral-900))',
         },
+        muted: {
+          100: 'hsl(var(--color-muted-100))',
+          900: 'hsl(var(--color-muted-900))',
+        },
       },
       fontFamily: {
         sans: ['InterVariable', 'ui-sans-serif', 'system-ui'],
