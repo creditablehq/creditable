@@ -37,6 +37,32 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           >
             Dashboard
           </NavLink>
+          <nav className="flex flex-col px-4 space-y-2">
+            <NavLink
+              to="/dashboard/clients"
+              className={({ isActive }) =>
+                isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+              }
+            >
+              Clients
+            </NavLink>
+            <NavLink
+              to="/dashboard/plans"
+              className={({ isActive }) =>
+                isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+              }
+            >
+              Plans
+            </NavLink>
+            <NavLink
+              to="/dashboard/settings"
+              className={({ isActive }) =>
+                isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+              }
+            >
+              Settings
+            </NavLink>
+          </nav>
           {/* <NavLink
             to="/style-guide"
             className={({ isActive }) =>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
 import Layout from './components/layout/Layout';
@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from './contexts/authContext';
 import SignupForm from './components/auth/SignupForm';
 import LoginForm from './components/auth/LoginForm';
 import ModalAuthWrapper from './components/auth/ModalAuthWrapper';
+import { Clients } from './routes/dashboard/Clients';
+import { Plans } from './routes/dashboard/Plans';
 
 const AppContent = () => {
   const { token, logout } = useAuth();
@@ -43,6 +45,10 @@ const AppContent = () => {
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              {/* <Route index element={<Navigate to="clients" />} /> */}
+              <Route path="dashboard/clients" element={<Clients />} />
+              <Route path="dashboard/plans" element={<Plans />} />
+              {/* <Route path="settings" element={<Settings />} /> */}
               <Route path="/style-guide" element={<StyleGuide />} />
             </Routes>
           </Layout>
