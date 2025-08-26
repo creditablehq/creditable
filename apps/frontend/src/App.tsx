@@ -4,7 +4,7 @@ import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
 import Layout from './components/layout/Layout';
 import StyleGuide from './pages/StyleGuide';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+// import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SignupForm from './components/auth/SignupForm';
 import LoginForm from './components/auth/LoginForm';
 import ModalAuthWrapper from './components/auth/ModalAuthWrapper';
@@ -68,9 +68,7 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
       <AppContent />
-    </AuthProvider>
   )
 }
 
