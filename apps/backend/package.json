@@ -8,7 +8,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "prisma:generate": "prisma generate",
     "prebuild": "cd ../../packages/rule-engine && pnpm build",
-    "build": "tsc -b && pnpm prisma:generate",
+    "build": "tsc && pnpm prisma:generate",
     "build:rule-engine": "tsc -b ../../packages/rule-engine",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "prisma migrate deploy && prisma generate",
