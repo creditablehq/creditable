@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@creditable/rule-engine": ["packages/rule-engine/src"]
+    }
+  }
+}

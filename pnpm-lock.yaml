@@ -14,6 +14,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@creditable/rule-engine':
+        specifier: file:../../packages/rule-engine
+        version: link:../../packages/rule-engine
       '@prisma/client':
         specifier: ^6.6.0
         version: 6.6.0(prisma@6.6.0(typescript@5.8.3))(typescript@5.8.3)
@@ -57,6 +60,9 @@ importers:
       prisma:
         specifier: ^6.6.0
         version: 6.6.0(typescript@5.8.3)
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@22.15.3)(typescript@5.8.3)
       ts-node-dev:
         specifier: ^2.0.0
         version: 2.0.0(@types/node@22.15.3)(typescript@5.8.3)
@@ -137,7 +143,18 @@ importers:
         specifier: ^6.3.1
         version: 6.3.1(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)(sass@1.86.3)
 
-  packages/rule-engine: {}
+  packages/rule-engine:
+    dependencies:
+      express:
+        specifier: ^4.18.2
+        version: 4.21.2
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.17
+        version: 4.17.21
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   packages/types:
     dependencies:

@@ -1,14 +1,17 @@
 {
+  "extends": "../../.tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "rootDir": "src",
     "outDir": "dist",
+    "composite": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },
+  "references": [{ "path": "../../packages/rule-engine" }],
   "include": ["src"],
   "exclude": ["dist"]
 }
