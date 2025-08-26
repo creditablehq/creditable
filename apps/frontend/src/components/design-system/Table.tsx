@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { cn } from '../../../lib/utils';
 
 interface TableProps {
@@ -5,9 +6,10 @@ interface TableProps {
   data: Array<Record<string, React.ReactNode>>;
   className?: string;
   emptyMessage?: string;
+  onRowClick?: (row: any) => void;
 }
 
-export function Table({ columns, data, className, emptyMessage = 'No data found.' }: TableProps) {
+export function Table({ columns, data, className, emptyMessage = 'No data found.', onRowClick }: TableProps) {
   return (
     <div className={cn('w-full overflow-x-auto rounded-md border border-neutral-200 dark:border-neutral-700', className)}>
       <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700 text-sm">
@@ -29,7 +31,10 @@ export function Table({ columns, data, className, emptyMessage = 'No data found.
             </tr>
           ) : (
             data.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-neutral-50 dark:bg-neutral-800'}>
+              <tr key={rowIndex} className={clsx(
+                rowIndex % 2 === 0 ? 'bg-white dark:bg-neutral-900' : 'bg-neutral-50 dark:bg-neutral-800',
+                typeof onRowClick === 'function' ? 'cursor-pointer hover:border hover:border-[#447DEE80]' : ''
+              )} onClick={() => onRowClick?.(row)}>
                 {columns.map((col) => (
                   <td key={col} className="px-4 py-2 text-neutral-800 dark:text-neutral-100">
                     {row[col]}
