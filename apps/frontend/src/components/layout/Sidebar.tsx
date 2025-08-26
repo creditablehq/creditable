@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import logo from "../../assets/creditable_transparent.png";
 
 const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { logout, user } = useAuth();
@@ -31,7 +32,7 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         `}
       >
         {/* Brand */}
-        <div className="text-xl font-bold text-brand mb-6">Creditable</div>
+        <div className="w-24 mb-8 overflow-hidden"><img src={logo} className="object-contain w-auto h-full" alt="Creditable Logo"/></div>
 
         {/* Navigation links */}
         <nav className="flex flex-col gap-3 text-sm flex-grow">

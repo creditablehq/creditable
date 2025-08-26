@@ -9,7 +9,11 @@
     "prisma:generate": "prisma generate",
     "build": "pnpm prisma:generate && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "prisma migrate deploy && prisma generate"
+    "deploy": "prisma migrate deploy && prisma generate",
+    "db:seed": "ts-node prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
