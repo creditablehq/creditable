@@ -9,7 +9,11 @@
     "prisma:generate": "prisma generate",
     "build": "pnpm prisma:generate && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "prisma migrate deploy && prisma generate"
+    "deploy": "prisma migrate deploy && prisma generate",
+    "db:seed": "ts-node prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +25,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "4",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.17.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -29,6 +34,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.3",
+    "@types/pdfkit": "^0.17.2",
     "prisma": "^6.6.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"

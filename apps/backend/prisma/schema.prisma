@@ -14,22 +14,25 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   name      String
   password  String
-  role      Role     @default(BROKER)
-  brokerId  String?
-  broker    Broker?  @relation(fields: [brokerId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @default(BROKER)
+  brokerId  String
+  broker    Broker    @relation(fields: [brokerId], references: [id])
+  companies Company[]
+  plans     Plan[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Broker {
   id        String    @id @default(uuid())
-  name      String
+  name      String    @unique
   users     User[]
   companies Company[]
+  plans     Float
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -37,35 +40,58 @@ model Broker {
 model Company {
   id        String   @id @default(uuid())
   name      String
-  broker    Broker   @relation(fields: [brokerId], references: [id])
-  brokerId  String
+  brokerId  String?
+  broker    Broker?  @relation(fields: [brokerId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   plans     Plan[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Plan {
-  id          String       @id @default(uuid())
-  name        String
-  year        Int
+  id                   String        @id @default(uuid())
+  name                 String
+  year                 Int
+  deductible           Float?
+  moop                 Float?
+  t1CostSharingType    CostShareType
+  t2CostSharingType    CostShareType
+  t3CostSharingType    CostShareType
+  t4CostSharingType    CostShareType
+  monthlyPremiumRx     Float?
+  integratedDeductible Boolean       @default(false)
+  t1ShareValue         Float?
+  t2ShareValue         Float?
+  t3ShareValue         Float?
+  t4ShareValue         Float?
+  t1UsesDeductible     Boolean       @default(false)
+  t2UsesDeductible     Boolean       @default(false)
+  t3UsesDeductible     Boolean       @default(false)
+  t4UsesDeductible     Boolean       @default(false)
+
   type        PlanType
-  inputData   Json?
   company     Company      @relation(fields: [companyId], references: [id])
   companyId   String
   evaluations Evaluation[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Evaluation {
-  id           String              @id @default(uuid())
-  plan         Plan                @relation(fields: [planId], references: [id])
-  planId       String
-  method       DeterminationMethod
-  result       CreditabilityStatus
-  isCreditable Boolean
-  reasoning    String?
-  createdAt    DateTime            @default(now())
+  id                   String              @id @default(uuid())
+  plan                 Plan                @relation(fields: [planId], references: [id])
+  planId               String
+  method               DeterminationMethod
+  result               CreditabilityStatus
+  isCreditable         Boolean
+  reasoning            String?
+  actuarialValue       Float?
+  actuarialAssumptions Json?
+  createdAt            DateTime            @default(now())
 }
 
 enum Role {
@@ -87,4 +113,9 @@ enum DeterminationMethod {
 enum PlanType {
   STANDARD
   HIGH_DEDUCTIBLE
+}
+
+enum CostShareType {
+  COPAY
+  COINSURANCE
 }

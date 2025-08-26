@@ -1,8 +1,15 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../../contexts/authContext";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import logo from "../../assets/creditable_transparent.png";
 
 const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate('/');
+    logout();
+  }
 
   return (
     <>
@@ -25,7 +32,7 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         `}
       >
         {/* Brand */}
-        <div className="text-xl font-bold text-brand mb-6">Creditable</div>
+        <div className="w-24 mb-8 overflow-hidden"><img src={logo} className="object-contain w-auto h-full" alt="Creditable Logo"/></div>
 
         {/* Navigation links */}
         <nav className="flex flex-col gap-3 text-sm flex-grow">
@@ -37,18 +44,42 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           >
             Dashboard
           </NavLink>
-          {/* <NavLink
+          <NavLink
+            to="/companies"
+            className={({ isActive }) =>
+              isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+            }
+          >
+            Clients
+          </NavLink>
+          {user?.role === 'ADMIN' && <NavLink
+            to="/brokers"
+            className={({ isActive }) => 
+              isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+            }
+          >
+            Brokers
+          </NavLink>}
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+            }
+          >
+            Settings
+          </NavLink>
+          {user?.role === 'ADMIN' && <NavLink
             to="/style-guide"
             className={({ isActive }) =>
               isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
             }
           >
             Style Guide
-          </NavLink> */}
+          </NavLink>}
         </nav>
 
         <div className="mt-auto pt-6 border-t border-neutral-200 dark:border-neutral-700">
-          <button onClick={logout} className="text-sm text-neutral-400 hover:text-red-500 w-full text-left cursor-pointer">
+          <button onClick={handleLogout} className="text-sm text-neutral-400 hover:text-red-500 w-full text-left cursor-pointer">
             Log out
           </button>
         </div>

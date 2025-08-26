@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/authContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../api/auth';
+import { cn } from '../../../lib/utils';
+import clsx from 'clsx';
 
 const LoginForm = () => {
-  const { setToken } = useAuth();
+  const { setToken, setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isFailedLogin, setFailedLogin] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      login({ email, password }).then(res => {
-        setToken(res?.token);
-      });
-    } catch (err) {
+    login({ email, password }).then(res => {
+      setToken(res?.token);
+      setUser(res?.user);
+    }).catch(err => {
+      setFailedLogin(true);
       console.error('Login failed:', err);
-    }
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className='flex flex-col gap-4 items-center'>
       <input
         type="email"
-        className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600"
+        className={cn(clsx('w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600', isFailedLogin ? 'border-red' : ''))}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
@@ -30,12 +33,16 @@ const LoginForm = () => {
       />
       <input
         type="password"
-        className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600"
+        className={cn(clsx('w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600', isFailedLogin ? 'border-red' : ''))}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         required
       />
+      {
+        isFailedLogin &&
+        <span className='content-start text-red-500'>Invalid username or password</span>
+      }
       <button
         type="submit"
         className="bg-brand text-white px-4 py-2 rounded w-40 hover:bg-brand-dark"

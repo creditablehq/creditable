@@ -32,6 +32,10 @@
   a {
     @apply text-brand hover:underline;
   }
+
+  li {
+    @apply list-none
+  }
 }
 
 :root {
@@ -41,6 +45,9 @@
 
   --color-neutral-100: 210 20% 98%;
   --color-neutral-900: 222 47% 11%;
+
+  --color-muted-100: 210 20% 62%;
+  --color-muted-900: 222 47% 40%;
 }
 
 .theme-green {
@@ -53,4 +60,29 @@
   --color-brand: 42 95% 55%;        /* Amber C */
   --color-brand-dark: 35 85% 45%;
   --color-brand-light: 48 96% 90%;
+}
+
+.input-base {
+  @apply border rounded-md px-3 py-2 transition-colors focus:outline-none focus:ring-2;
+  border-color: var(--color-neutral-300);
+}
+
+.dark .input-base {
+  border-color: var(--color-neutral-700);
+}
+
+.input-error {
+  @apply border-red-500 focus:ring-red-500;
+}
+
+.label-error {
+  @apply text-red-600;
+}
+
+.error-text {
+  @apply text-sm text-red-600;
+}
+
+.help-text {
+  @apply text-sm text-gray-500;
 }

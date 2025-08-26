@@ -4,13 +4,18 @@ import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
 import Layout from './components/layout/Layout';
 import StyleGuide from './pages/StyleGuide';
-import { AuthProvider, useAuth } from './contexts/authContext';
 import SignupForm from './components/auth/SignupForm';
 import LoginForm from './components/auth/LoginForm';
 import ModalAuthWrapper from './components/auth/ModalAuthWrapper';
+import { Clients } from './routes/Clients';
+import { Brokers } from './routes/Brokers';
+import CompanyDetail from './pages/companies/[companyId]';
+import { Settings } from './routes/Settings';
+import ProtectedRoute from './routes/ProtectedRoute';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 
 const AppContent = () => {
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
   const [showAuthForm, setShowAuthForm ] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('login');
   const [ping, setPing] = useState<string | null>(null);
@@ -43,7 +48,16 @@ const AppContent = () => {
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/style-guide" element={<StyleGuide />} />
+              {/* <Route index element={<Navigate to="clients" />} /> */}
+              <Route path="/companies" element={<Clients />} />
+              <Route path="/companies/:companyId" element={<CompanyDetail />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                <Route path="/brokers" element={<Brokers />} />
+              </Route>
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                <Route path="/style-guide" element={<StyleGuide />} />
+              </Route>
             </Routes>
           </Layout>
         </Router>
