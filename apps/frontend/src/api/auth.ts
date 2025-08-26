@@ -30,18 +30,45 @@ interface LoginData {
 }
 
 export async function login(data: LoginData) {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || 'Failed to login');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to login');
+    }
+
+    return res.json(); // This should return the JWT token
+  } catch (e: any) {
+    console.error('Error on login: ', e?.message);
+    throw e;
   }
+}
 
-  return res.json(); // This should return the JWT token
+export async function updateUser(id: string, data: any) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/update-user/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to update user');
+    }
+
+    return res.json();
+  } catch (e: any) {
+    console.error('Error updating user: ', e);
+    throw e;
+  }
 }
