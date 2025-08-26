@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ActuarialAssumptions, evaluatePlan } from '@creditable/rule-engine';
+import { ActuarialAssumptions, evaluatePlan } from '../rule-engine';
 import { DeterminationMethod } from '@prisma/client';
 
 const router = Router() as Router;

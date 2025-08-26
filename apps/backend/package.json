@@ -7,9 +7,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "prisma:generate": "prisma generate",
-    "prebuild": "cd ../../packages/rule-engine && pnpm build",
-    "build": "tsc && pnpm prisma:generate",
-    "build:rule-engine": "tsc -b ../../packages/rule-engine",
+    "build": "tsc -b && pnpm prisma:generate",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "prisma migrate deploy && prisma generate",
     "db:seed": "ts-node prisma/seed.ts"
@@ -28,8 +26,7 @@
     "dotenv": "^16.5.0",
     "express": "4",
     "jsonwebtoken": "^9.0.2",
-    "pdfkit": "^0.17.1",
-    "@creditable/rule-engine": "workspace:*"
+    "pdfkit": "^0.17.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

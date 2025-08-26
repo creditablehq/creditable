@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
-import { evaluatePlan } from '@creditable/rule-engine';
+import { evaluatePlan } from '../rule-engine';
 
 const router = Router() as Router;
 

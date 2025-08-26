@@ -14,9 +14,6 @@ importers:
 
   apps/backend:
     dependencies:
-      '@creditable/rule-engine':
-        specifier: workspace:*
-        version: link:../../packages/rule-engine
       '@prisma/client':
         specifier: ^6.6.0
         version: 6.6.0(prisma@6.6.0(typescript@5.8.3))(typescript@5.8.3)
