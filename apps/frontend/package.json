@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@creditable/rule-engine": "workspace:^",
-    "@creditable/types": "workspace:^",
     "@headlessui/react": "^2.2.3",
     "@tailwindcss/vite": "^4.1.4",
     "clsx": "^2.1.1",
