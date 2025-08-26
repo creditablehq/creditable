@@ -1,6 +1,6 @@
 // src/components/SignupForm.tsx
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/authContext'; // Import the custom auth hook
+import { useAuth } from '../../contexts/AuthContext'; // Import the custom auth hook
 import { signUp } from '../../api/auth';
 
 const SignupForm = () => {
@@ -21,7 +21,6 @@ const SignupForm = () => {
 
       if (response.token) {
         setToken(response.token); // Store the token in the context
-        console.log('Signup successful');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during signup');
