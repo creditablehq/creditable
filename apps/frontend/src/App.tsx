@@ -12,7 +12,7 @@ import { Brokers } from './routes/Brokers';
 import CompanyDetail from './pages/companies/[companyId]';
 import { Settings } from './routes/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
-import { useAuth, AuthProvider } from './contexts/authContext';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 
 const AppContent = () => {
   const { token } = useAuth();
