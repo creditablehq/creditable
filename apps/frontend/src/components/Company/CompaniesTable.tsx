@@ -14,7 +14,7 @@ interface ExtractedClientData extends Record<string, ReactNode> {
   'Client Since': string,
 };
 
-export function CompaniesTable() {
+export function CompaniesTable({ newCompany }: any) {
   const [companies, setCompanies] = useState<ExtractedClientData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,12 +41,21 @@ export function CompaniesTable() {
     fetchCompanies();
   }, []);
 
+  useEffect(() => {
+    if (newCompany) {
+      setLoading(true);
+      const mappedBrokers = mapClient([...companies, newCompany])
+      setCompanies(mappedBrokers);
+      setLoading(false);
+    }
+  }, [newCompany])
+
   const mapClient = (clients: any[]) => {
     return clients?.map(c => {
       let extratedClient: ExtractedClientData = {
-        id: c.id,
-        Name: c.name,
-        Plans: c?.plans?.length,
+        id: c?.id,
+        Name: c?.name,
+        Plans: c?.plans?.length ?? 0,
         'Created By': c?.user?.name,
         'Client Since': new Date(c?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
       };

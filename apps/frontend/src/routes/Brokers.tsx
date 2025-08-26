@@ -7,11 +7,11 @@ import { createBroker } from "../api/brokers";
 
 export function Brokers() {
   const [isOpen, setIsOpen] = useState(false);
+  const [createdBroker, setCreatedBroker] = useState(null);
 
   const handleCreateBroker = async (data: BrokerFormInput) => {
     const broker = await createBroker(data);
-    window.location.reload();
-    // Optionally trigger a refetch or update UI
+    setCreatedBroker(broker);
   };
 
   return (
@@ -21,7 +21,7 @@ export function Brokers() {
         <Button onClick={() => setIsOpen(true)}>+ Add Broker</Button>
       </div>
 
-      <BrokersTable />
+      <BrokersTable newBroker={createdBroker} />
 
       <BrokerModal
         open={isOpen}

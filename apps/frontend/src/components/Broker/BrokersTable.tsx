@@ -4,7 +4,6 @@ import { ReactNode, useContext, useEffect, useState } from 'react';
 import { getBrokers } from '../../api/brokers';
 import { Table } from '../design-system/Table';
 import { AuthContext } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 interface ExtractedBrokerData extends Record<string, ReactNode> {
   id: string,
@@ -14,13 +13,12 @@ interface ExtractedBrokerData extends Record<string, ReactNode> {
   'Broker Since': string,
 };
 
-export function BrokersTable() {
+export function BrokersTable({ newBroker }: any) {
   const [brokers, setBrokers] = useState<ExtractedBrokerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const auth = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchBrokers() {
@@ -41,12 +39,21 @@ export function BrokersTable() {
     fetchBrokers();
   }, []);
 
+  useEffect(() => {
+    if (newBroker) {
+      setLoading(true);
+      const mappedBrokers = mapBrokers([...brokers, newBroker])
+      setBrokers(mappedBrokers);
+      setLoading(false);
+    }
+  }, [newBroker])
+
   const mapBrokers = (brokers: any[]) => {
     return brokers?.map(b => {
       let extractedBroker: ExtractedBrokerData = {
-        id: b.id,
-        Name: b.name,
-        Users: b.users.length,
+        id: b?.id,
+        Name: b?.name,
+        Users: b?.users?.length ?? 0,
         Plans: b?.plans,
         'Broker Since': new Date(b?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
       };

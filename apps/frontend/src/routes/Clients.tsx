@@ -6,11 +6,11 @@ import { CompaniesTable } from "../components/Company/CompaniesTable";
 
 export function Clients() {
   const [isOpen, setIsOpen] = useState(false);
+  const [createdCompany, setCreatedCompany] = useState(null);
 
   const handleCreateCompany = async (data: { name: string }) => {
     const company = await createCompany(data);
-    window.location.reload();
-    // Optionally trigger a refetch or update UI
+    setCreatedCompany(company);
   };
 
   return (
@@ -20,7 +20,7 @@ export function Clients() {
         <Button onClick={() => setIsOpen(true)}>+ New Company</Button>
       </div>
 
-      <CompaniesTable />
+      <CompaniesTable newCompany={createdCompany} />
 
       <CompanyModal
         open={isOpen}
