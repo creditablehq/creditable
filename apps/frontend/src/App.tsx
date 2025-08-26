@@ -4,7 +4,6 @@ import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
 import Layout from './components/layout/Layout';
 import StyleGuide from './pages/StyleGuide';
-// import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SignupForm from './components/auth/SignupForm';
 import LoginForm from './components/auth/LoginForm';
 import ModalAuthWrapper from './components/auth/ModalAuthWrapper';
@@ -13,6 +12,7 @@ import { Brokers } from './routes/Brokers';
 import CompanyDetail from './pages/companies/[companyId]';
 import { Settings } from './routes/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 
 const AppContent = () => {
   const { token } = useAuth();
@@ -68,7 +68,9 @@ const AppContent = () => {
 
 const App = () => {
   return (
+    <AuthProvider>
       <AppContent />
+    </AuthProvider>
   )
 }
 
