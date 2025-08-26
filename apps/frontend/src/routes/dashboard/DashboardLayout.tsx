@@ -5,8 +5,7 @@ export function DashboardLayout() {
     <div className="flex h-screen">
       <aside className="w-64 bg-white border-r dark:bg-neutral-900 dark:border-neutral-700">
         <nav className="p-4 space-y-2">
-          <NavLink to="/dashboard/clients" className="block">Clients</NavLink>
-          <NavLink to="/dashboard/plans" className="block">Plans</NavLink>
+          <NavLink to="/companies" className="block">Clients</NavLink>
           <NavLink to="/dashboard/settings" className="block">Settings</NavLink>
         </nav>
       </aside>
