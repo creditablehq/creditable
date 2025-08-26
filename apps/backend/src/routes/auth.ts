@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { hashPassword, comparePasswords, createJWT } from '../services/auth';
 
-const router = Router();
+const router = Router() as Router;
 
 router.post('/signup', async (req: Request, res: Response) => {
   const { email, password, name, brokerId } = req.body;

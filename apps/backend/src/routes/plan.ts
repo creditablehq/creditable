@@ -8,7 +8,7 @@ import { Evaluation } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 
-const router = Router();
+const router = Router() as Router;
 
 router.use(authMiddleware);
 

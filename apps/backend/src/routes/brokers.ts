@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma';
 import { hashPassword } from '../services/auth';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
 
-const router = Router();
+const router = Router() as Router;
 
 // Apply auth middleware to all company routes
 router.use(authMiddleware);

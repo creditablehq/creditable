@@ -2,9 +2,9 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
-import { evaluatePlan } from '../../../../packages/rule-engine';
+import { evaluatePlan } from '@creditable/rule-engine';
 
-const router = Router();
+const router = Router() as Router;
 
 // Apply auth middleware to all company routes
 router.use(authMiddleware);
@@ -210,7 +210,9 @@ router.post('/:companyId/plans', async (req, res) => {
           create: filteredEvaluation.map((e) => ({
             method: e.method,
             actuarialValue: e.actuarialPercentage,
-            actuarialAssumptions: e.actuarialAssumptions,
+            actuarialAssumptions: JSON.parse(
+              JSON.stringify(e.actuarialAssumptions)
+            ),
             isCreditable: e.isCreditable,
             result: e.result,
             reasoning: e.reasoning,

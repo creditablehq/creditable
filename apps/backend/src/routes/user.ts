@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
 
-const router = Router();
+const router = Router() as Router;
 
 router.use(authMiddleware);
 
