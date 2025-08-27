@@ -28,7 +28,14 @@ router.get('/:id/report', async (req, res) => {
     const evaluation = plan.evaluations.at(-1);
 
     const logoBuffer = fs.readFileSync(
-      path.join(__dirname, 'creditable_transparent.png')
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        'public',
+        'images',
+        'creditable_transparent.png'
+      )
     );
 
     addWatermark(doc, logoBuffer);
@@ -54,7 +61,7 @@ router.get('/:id/report', async (req, res) => {
       .font('Helvetica-Bold')
       .text('Plan Name: ', { continued: true })
       .font('Helvetica')
-      .text(`${plan.name}`);
+      .text(`${plan?.name || 'N/A'}`);
     doc
       .font('Helvetica-Bold')
       .text('Company: ', { continued: true })
@@ -139,7 +146,7 @@ router.get('/:id/report', async (req, res) => {
 
     doc.end();
   } catch (error) {
-    console.error('[GET /plans/:id/report', error);
+    console.error('[GET] /plans/:id/report', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -149,12 +156,17 @@ function addWatermark(
   logoBuffer: Buffer<ArrayBufferLike>
 ) {
   const { width, height } = doc.page;
-  const logoWidth = 300; // scale as needed
+  const logoWidth = 600; // scale as needed
   const x = (width - logoWidth) / 2;
   const y = (height - logoWidth) / 2;
 
+  doc.save();
   doc.opacity(0.1); // light transparency
-  doc.image(logoBuffer, x, y, { width: logoWidth });
+  doc
+    .translate(x + width / 2, y + height / 2)
+    .rotate(-45)
+    .image(logoBuffer, -width / 3, -height / 2, { width: logoWidth })
+    .restore();
   doc.opacity(1); // reset for normal content
 }
 
