@@ -82,7 +82,7 @@ export default function PlanCard({ plan }: PlanCardProps) {
                     : 'secondary'
                 }
               >
-                {latestEvaluation?.actuarialValue * 100}%
+                {(latestEvaluation?.actuarialValue * 100).toFixed(1)}%
               </Badge>
               <Tooltip anchorSelect="#av-anchor" place="bottom" style={{zIndex: '999'}}>
               {latestEvaluation.reasoning}
