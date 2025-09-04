@@ -58,7 +58,6 @@ export default function PlanCard({ plan }: PlanCardProps) {
         <div>
           <h3 className="font-semibold cursor-pointer" onClick={() => setExpanded((prev) => !prev)}>{plan.name} ({plan.year})</h3>
           <div className="flex flex-row gap-2">
-
             <Badge
               variant={
                 latestEvaluation?.isCreditable
@@ -73,7 +72,7 @@ export default function PlanCard({ plan }: PlanCardProps) {
             {latestEvaluation.actuarialValue &&
             <>
               <Badge
-                id="av-anchor"
+                id={`av-anchor-${plan.id}`}
                 variant={
                   latestEvaluation?.result === 'CREDITABLE'
                     ? 'success'
@@ -84,7 +83,7 @@ export default function PlanCard({ plan }: PlanCardProps) {
               >
                 {(latestEvaluation?.actuarialValue * 100).toFixed(1)}%
               </Badge>
-              <Tooltip anchorSelect="#av-anchor" place="bottom" style={{zIndex: '999'}}>
+              <Tooltip anchorSelect={`#av-anchor-${plan.id}`} place="bottom" style={{zIndex: '999'}}>
               {latestEvaluation.reasoning}
               </Tooltip>
             </>
