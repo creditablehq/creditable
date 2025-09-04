@@ -95,7 +95,7 @@ export function ActuarialAssumptionsModal({open, onClose, planName, onSetForPlan
               id="t3-utilization"
               type="number"
               value={form.t3Utilization}
-              onChange={(e) => handleChange('31Utilization', parseFloat(e.target.value))}
+              onChange={(e) => handleChange('t3Utilization', parseFloat(e.target.value))}
             />
           </Label>
           <Label htmlFor="t4-utilization">Tier 4
