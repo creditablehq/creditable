@@ -3,18 +3,18 @@ import { Button, Input, Label } from "../design-system";
 import { Modal } from "../design-system/Modal";
 
 const INITIAL_ASSUMPTIONS_VALUES = {
-  t1Utilization: 0.5,
-  t2Utilization: 0.3,
-  t3Utilization: 0.15,
-  t4Utilization: 0.05,
+  t1Utilization: 0.65,
+  t2Utilization: 0.25,
+  t3Utilization: 0.07,
+  t4Utilization: 0.03,
   t1FillCost: 20,
   t2FillCost: 100,
   t3FillCost: 250,
-  t4FillCost: 500,
+  t4FillCost: 5000,
   annualFillsPerTier: 12,
   defaultBrandFillCounter: 10,
   estimatedAnnualFills: 42,
-  rxDeductibleAllocation: 0.33,
+  rxDeductibleAllocation: 0.2,
 }
 
 interface ActuarialAssumptionsModalProps {
@@ -146,22 +146,6 @@ export function ActuarialAssumptionsModal({open, onClose, planName, onSetForPlan
 
         <div className="flex flex-col gap-2 p-2">
           <legend className="font-medium text-center">Misc.</legend>
-          <Label htmlFor="annual-fills">Annual Fills Per Tier
-            <Input
-              id="annual-fills"
-              type="number"
-              value={form.annualFillsPerTier}
-              onChange={(e) => handleChange('annualFillsPerTier', parseFloat(e.target.value))}
-            />
-          </Label>
-          <Label htmlFor="brand-fill-count">Brand Fill Count
-            <Input
-              id="brand-fill-count"
-              type="number"
-              value={form.defaultBrandFillCounter}
-              onChange={(e) => handleChange('defaultBrandFillCounter', parseFloat(e.target.value))}
-            />
-          </Label>
           <Label htmlFor="estimated-annual-fills">Estimated Annual Fills
             <Input
               id="estimated-annual-fills"
