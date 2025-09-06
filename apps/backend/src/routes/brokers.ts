@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
   const broker = await prisma.broker.create({
     data: {
       name: name,
-      plans: totalPlans,
+      planLimit: totalPlans,
       users: {
         create: {
           name: userName,
