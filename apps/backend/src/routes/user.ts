@@ -18,6 +18,7 @@ router.get('/me', async (req, res) => {
             evaluations: true,
           },
         },
+        broker: true,
       },
     });
     if (me) {
