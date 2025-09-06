@@ -9,6 +9,8 @@ import { getCompanyById } from '../../api/companies';
 import { Modal } from '../../components/design-system/Modal';
 import { Button } from '../../components/design-system/Button';
 import PlanCard from '../../components/Company/PlanCard';
+import { getMe } from '../../api/user';
+import { Tooltip } from 'react-tooltip';
 
 export default function CompanyDetail() {
   const { companyId } = useParams();
@@ -16,11 +18,14 @@ export default function CompanyDetail() {
   const [company, setCompany] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [me, setMe] = useState<any>(null);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     async function initCompanyInfo() {
       getCompanyById(companyId!).then(setCompany);
       getPlansByCompany(companyId!).then(setPlans);
+      getMe().then(setMe);
     }
 
     initCompanyInfo();
@@ -29,13 +34,26 @@ export default function CompanyDetail() {
     }, 500)
   }, [companyId]);
 
+  useEffect(() => {
+    setDisabled(me?.broker?.currentPlanCount >= me?.broker?.planLimit)
+  }, [me])
+
   if (loading) return <p>Loading company info...</p>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Plans for <span className="text-neutral-700 font-light italic">{company?.name}</span></h1>
-        <Button onClick={() => setIsOpen(true)}>+ Add Plan</Button>
+        <Button
+          id="add-plan-btn"
+          onClick={() => setIsOpen(true)}
+          variant={disabled ? 'disabled' : 'default'}
+        >
+          + Add Plan
+        </Button>
+        <Tooltip anchorSelect="#add-plan-btn" place="bottom">
+          Plan limit reached. Contact to increase plan maximum.
+        </Tooltip>
       </div>
 
       {!plans.length && 
@@ -51,6 +69,7 @@ export default function CompanyDetail() {
           companyId={companyId!}
           onPlanCreated={() => {
             getPlansByCompany(companyId!).then(setPlans);
+            getMe().then(setMe);
             setIsOpen(false);
           }}
         />

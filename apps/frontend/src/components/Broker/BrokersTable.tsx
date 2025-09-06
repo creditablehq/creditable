@@ -54,7 +54,7 @@ export function BrokersTable({ newBroker }: any) {
         id: b?.id,
         Name: b?.name,
         Users: b?.users?.length ?? 0,
-        Plans: b?.plans,
+        Plans: b?.planLimit,
         'Broker Since': new Date(b?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
       };
       return extractedBroker;

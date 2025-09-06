@@ -9,11 +9,7 @@
     "prisma:generate": "prisma generate",
     "build": "pnpm prisma:generate && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "prisma migrate deploy && prisma generate",
-    "db:seed": "ts-node prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "deploy": "prisma migrate deploy && prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -36,7 +32,7 @@
     "@types/node": "^22.15.3",
     "@types/pdfkit": "^0.17.2",
     "prisma": "^6.6.0",
-    "ts-node": "^10.9.2",
+    "ts-node": "10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }

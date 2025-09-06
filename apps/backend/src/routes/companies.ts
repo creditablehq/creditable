@@ -169,9 +169,23 @@ router.post('/:companyId/plans', async (req, res) => {
     evaluationMethod,
     actuarialAssumptions,
   } = req.body;
-  const { id } = req.user || {};
+  const { id, brokerId } = req.user || {};
 
   try {
+    if (brokerId) {
+      const broker = await prisma.broker.findUnique({
+        where: { id: brokerId },
+      });
+
+      if (broker && broker.currentPlanCount >= broker?.planLimit) {
+        return res
+          .status(402)
+          .json({
+            message: 'Plan limit reached. Contact to increase plan maximum.',
+          });
+      }
+    }
+
     const company = await prisma.company.findUnique({
       where: { id: companyId },
     });
@@ -226,6 +240,17 @@ router.post('/:companyId/plans', async (req, res) => {
         },
       },
     });
+
+    if (brokerId) {
+      await prisma.broker.update({
+        where: { id: brokerId },
+        data: {
+          currentPlanCount: {
+            increment: 1,
+          },
+        },
+      });
+    }
 
     return res.status(201).json(plan);
   } catch (error) {
