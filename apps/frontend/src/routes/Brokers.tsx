@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../components/design-system";
 import { BrokerModal } from "../components/Broker/BrokerModal";
 import { BrokersTable } from "../components/Broker/BrokersTable";
 import { BrokerFormInput } from "../types/BrokerForm";
 import { createBroker } from "../api/brokers";
+import { AuthContext } from "../contexts/AuthContext";
 
 export function Brokers() {
   const [isOpen, setIsOpen] = useState(false);
   const [createdBroker, setCreatedBroker] = useState(null);
+  const auth = useContext(AuthContext);
 
   const handleCreateBroker = async (data: BrokerFormInput) => {
     const broker = await createBroker(data);
@@ -21,7 +23,11 @@ export function Brokers() {
         <Button onClick={() => setIsOpen(true)}>+ Add Broker</Button>
       </div>
 
-      <BrokersTable newBroker={createdBroker} />
+      {
+        auth?.token ?
+        <BrokersTable newBroker={createdBroker} />
+        : <div>Loading...</div>
+      }
 
       <BrokerModal
         open={isOpen}

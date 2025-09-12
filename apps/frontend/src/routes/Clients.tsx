@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../components/design-system";
 import { CompanyModal } from "../components/Company/CompanyModal";
 import { createCompany } from "../api/companies";
 import { CompaniesTable } from "../components/Company/CompaniesTable";
+import { AuthContext } from "../contexts/AuthContext";
 
 export function Clients() {
   const [isOpen, setIsOpen] = useState(false);
   const [createdCompany, setCreatedCompany] = useState(null);
+
+  const auth = useContext(AuthContext);
+  
 
   const handleCreateCompany = async (data: { name: string }) => {
     const company = await createCompany(data);
@@ -20,7 +24,11 @@ export function Clients() {
         <Button onClick={() => setIsOpen(true)}>+ New Company</Button>
       </div>
 
-      <CompaniesTable newCompany={createdCompany} />
+      {
+        auth?.token ?
+          <CompaniesTable newCompany={createdCompany} /> :
+          <div>Loading...</div>
+      }
 
       <CompanyModal
         open={isOpen}

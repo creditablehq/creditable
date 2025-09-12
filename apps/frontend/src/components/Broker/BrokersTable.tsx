@@ -24,7 +24,6 @@ export function BrokersTable({ newBroker }: any) {
     async function fetchBrokers() {
       try {
         setLoading(true);
-        if (!auth?.token) return;
         const data = await getBrokers();
         const brokers = mapBrokers(data);
         setBrokers(brokers);
@@ -37,7 +36,7 @@ export function BrokersTable({ newBroker }: any) {
     }
 
     fetchBrokers();
-  }, []);
+  }, [auth?.token]);
 
   useEffect(() => {
     if (newBroker) {

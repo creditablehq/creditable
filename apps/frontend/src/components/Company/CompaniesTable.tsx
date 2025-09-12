@@ -26,7 +26,6 @@ export function CompaniesTable({ newCompany }: any) {
     async function fetchCompanies() {
       try {
         setLoading(true);
-        if (!auth?.token) return;
         const data = await getCompanies();
         const newClients = mapClient(data);
         setCompanies(newClients);
@@ -39,7 +38,7 @@ export function CompaniesTable({ newCompany }: any) {
     }
 
     fetchCompanies();
-  }, []);
+  }, [auth?.token]);
 
   useEffect(() => {
     if (newCompany) {
