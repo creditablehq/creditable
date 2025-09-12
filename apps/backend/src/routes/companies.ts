@@ -166,6 +166,10 @@ router.post('/:companyId/plans', async (req, res) => {
     t2UsesDeductible,
     t3UsesDeductible,
     t4UsesDeductible,
+    t1CapValue,
+    t2CapValue,
+    t3CapValue,
+    t4CapValue,
     evaluationMethod,
     actuarialAssumptions,
   } = req.body;
@@ -178,11 +182,9 @@ router.post('/:companyId/plans', async (req, res) => {
       });
 
       if (broker && broker.currentPlanCount >= broker?.planLimit) {
-        return res
-          .status(402)
-          .json({
-            message: 'Plan limit reached. Contact to increase plan maximum.',
-          });
+        return res.status(402).json({
+          message: 'Plan limit reached. Contact to increase plan maximum.',
+        });
       }
     }
 
@@ -220,6 +222,10 @@ router.post('/:companyId/plans', async (req, res) => {
         t2UsesDeductible,
         t3UsesDeductible,
         t4UsesDeductible,
+        t1CapValue,
+        t2CapValue,
+        t3CapValue,
+        t4CapValue,
         evaluations: {
           create: filteredEvaluation.map((e) => ({
             method: e.method,
