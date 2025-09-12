@@ -30,6 +30,12 @@ type PlanCardProps = {
     t2UsesDeductible: boolean;
     t3UsesDeductible: boolean;
     t4UsesDeductible: boolean;
+
+    t1CapValue: number;
+    t2CapValue: number;
+    t3CapValue: number;
+    t4CapValue: number;
+
     evaluations: {
       method: string;
       result: CreditabilityStatus;
@@ -119,6 +125,7 @@ export default function PlanCard({ plan }: PlanCardProps) {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Share Type</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Share Value</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cap Value</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uses Deductible</th>
               </tr>
             </thead>
@@ -132,6 +139,9 @@ export default function PlanCard({ plan }: PlanCardProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t1ShareValue}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {plan.t1CapValue}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t1UsesDeductible ? 'Yes' : 'No'}
@@ -148,6 +158,9 @@ export default function PlanCard({ plan }: PlanCardProps) {
                   {plan.t2ShareValue}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {plan.t2CapValue}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t2UsesDeductible ? 'Yes' : 'No'}
                 </td>
               </tr>
@@ -162,6 +175,9 @@ export default function PlanCard({ plan }: PlanCardProps) {
                   {plan.t3ShareValue}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {plan.t3CapValue}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t3UsesDeductible ? 'Yes' : 'No'}
                 </td>
               </tr>
@@ -174,6 +190,9 @@ export default function PlanCard({ plan }: PlanCardProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t4ShareValue}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {plan.t4CapValue}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {plan.t4UsesDeductible ? 'Yes' : 'No'}
