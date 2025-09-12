@@ -14,10 +14,10 @@ export function PlansTable({ companyId }: PlansTableProps) {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
 
-  console.log('Plans Table mounted', import.meta.env.VITE_API_BASE_URL);
-
   useEffect(() => {
     console.log('useEffect triggered with token: ', auth?.token);
+    if (!auth?.token) return;
+
     async function fetchPlans() {
       try {
         const data = await getPlansByCompany(companyId);

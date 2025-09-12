@@ -16,7 +16,7 @@ export async function getPlansByCompany(companyId: string) {
     }
 
     return res.json();
-  }
+  } else return [];
 }
 
 export async function createPlan(companyId: string, data: any) {

@@ -34,7 +34,7 @@ export async function getCompanies() {
     }
 
     return res.json();
-  }
+  } else return [];
 }
 
 export async function getCompanyById(id: string) {
