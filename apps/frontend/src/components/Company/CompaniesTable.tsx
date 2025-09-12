@@ -22,7 +22,11 @@ export function CompaniesTable({ newCompany }: any) {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
 
+  console.log('Companies Table mounted', import.meta.env.VITE_API_URL);
+
   useEffect(() => {
+    console.log('useEffect triggered with token: ', auth?.token);
+
     async function fetchCompanies() {
       try {
         setLoading(true);

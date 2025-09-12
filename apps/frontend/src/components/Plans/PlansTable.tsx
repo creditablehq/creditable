@@ -14,7 +14,10 @@ export function PlansTable({ companyId }: PlansTableProps) {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
 
+  console.log('Plans Table mounted', import.meta.env.VITE_API_URL);
+
   useEffect(() => {
+    console.log('useEffect triggered with token: ', auth?.token);
     async function fetchPlans() {
       try {
         const data = await getPlansByCompany(companyId);
@@ -24,7 +27,7 @@ export function PlansTable({ companyId }: PlansTableProps) {
       }
     }
 
-    if (auth?.token) fetchPlans();
+    fetchPlans();
   }, [companyId, auth?.token]);
 
   if (error) return <p className="text-red-500">{error}</p>;

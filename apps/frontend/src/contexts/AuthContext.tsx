@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setAuthToken(storedToken);
     }
 
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('token', token ?? '');
@@ -108,6 +108,8 @@ export const useFetch = (url: string, options: any) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const auth = useContext(AuthContext);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -127,8 +129,9 @@ export const useFetch = (url: string, options: any) => {
       }
     };
 
+    if (!auth?.token) return
     fetchData();
-  }, [url, options]); // Dependencies to re-run effect
+  }, [url, options, auth?.token]); // Dependencies to re-run effect
 
   return { data, loading, error };
 }
