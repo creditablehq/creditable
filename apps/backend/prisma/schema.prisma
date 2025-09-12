@@ -70,6 +70,10 @@ model Plan {
   t2UsesDeductible     Boolean       @default(false)
   t3UsesDeductible     Boolean       @default(false)
   t4UsesDeductible     Boolean       @default(false)
+  t1CapValue           Int           @default(0)
+  t2CapValue           Int           @default(0)
+  t3CapValue           Int           @default(0)
+  t4CapValue           Int           @default(0)
 
   type        PlanType
   company     Company      @relation(fields: [companyId], references: [id])

@@ -24,6 +24,11 @@ export interface PlanInput {
   t2UsesDeductible: boolean;
   t3UsesDeductible: boolean;
   t4UsesDeductible: boolean;
+
+  t1CapValue: number;
+  t2CapValue: number;
+  t3CapValue: number;
+  t4CapValue: number;
 }
 
 // response type
@@ -150,7 +155,7 @@ function evaluateActuarial(
   // 🧠 Example rules — replace these with real rules as needed
   const grossCost = calculateGrossCost(actuarialAssumptions);
   const planPays = calculatePlanPays(grossCost, plan, actuarialAssumptions);
-  console.log(grossCost, planPays);
+  // console.log(grossCost, planPays);
   const actuarialPercentage = planPays / grossCost;
 
   if (actuarialPercentage >= ACTUARIAL_COVERAGE_EXPECTATION) {
@@ -211,16 +216,6 @@ function evaluateSimplified(
   };
 }
 
-/**
- * Gross Cost =
- *    [T1FillCost...T4FillCost]
- *    AM3:AP3 (T1Fills...T4Fills) (TnFills = TnUtil% * EstTotalFills)
- *    Sum(TnFills * TnFillCost)
- *    Ex: SumProduct([20 100 250 500], [.5 * 42, .3 * 42, .15 * 42, .05 * 42])
- *          = SumProduct([20, 100, 250, 500], [21, 12.6, 6.3, 2.1])
- *          = Sum([420, 1260, 1575, 1050])
- *          = 4305
- */
 function calculateGrossCost(
   actuarialAssumptions: ActuarialAssumptions
 ): number {
@@ -246,70 +241,23 @@ function calculateGrossCost(
   );
 }
 
-/**
- * Plan Pays =
- *      [Gross Cost - Total Member Pays]
- *
- * Total Member Pays =
- *      Sum([T1MemberPays...T4MemberPays])
- *
- * Tn Member Pays = MIN (
- *                    If (TnCostShare = "coinsurance") {
- *                        TnFills * TnShareValue * TnFillCost
- *                    } else {
- *                        TnFills * TnShareValue
- *                    },
- *                    MOOP
- *                  )
- *
- *
- *
- * TnFills = estimatedTotalFills * TnUtil
- *
- */
 function calculatePlanPays(
   grossCost: number,
   plan: PlanInput,
   actuarialAssumptions: ActuarialAssumptions
 ): number {
-  const { t1ShareValue, t2ShareValue, t3ShareValue, t4ShareValue, moop } = plan;
-  const {
-    t1Utilization,
-    t2Utilization,
-    t3Utilization,
-    t4Utilization,
-    estimatedAnnualFills,
-  } = actuarialAssumptions;
-  const fillCost = [
-    actuarialAssumptions.t1FillCost,
-    actuarialAssumptions.t2FillCost,
-    actuarialAssumptions.t3FillCost,
-    actuarialAssumptions.t4FillCost,
-  ];
-
-  // let tnMemberPays = [];
   let tnMemberTotalCost = calculateTnMemberTotalCost(
     plan,
     actuarialAssumptions
   );
 
-  // for (let i = 0; i < 4; i++) {
-  //   let n = i + 1;
-  //   const costShareType = `t${n}CostSharingType` as keyof PlanInput;
-  //   if (plan[costShareType] === 'COINSURANCE') {
-  //     tnMemberPays.push(Math.min(tnMemberTotalCost[i] * fillCost[i], moop));
-  //   } else {
-  //     tnMemberPays.push(Math.min(tnMemberTotalCost[i], moop));
-  //   }
-  // }
-
   const totalMemberPays = tnMemberTotalCost.reduce(
     (arr, curr) => arr + curr,
     0
   );
-  console.log('======== MEMBER COST ==========', totalMemberPays);
+  // console.log('======== MEMBER COST ==========', totalMemberPays);
 
-  console.log('plan pays: ', grossCost, tnMemberTotalCost, totalMemberPays);
+  // console.log('plan pays: ', grossCost, tnMemberTotalCost, totalMemberPays);
 
   return grossCost - totalMemberPays;
 }
@@ -317,12 +265,11 @@ function calculatePlanPays(
 /**
  * AV% = Plan Pays /  Gross Cost
  */
-
 function calculateTnMemberTotalCost(
   plan: PlanInput,
   actuarialAssumptions: ActuarialAssumptions
 ): number[] {
-  const effectiveDeductible = plan.integratedDeductible
+  let effectiveDeductible = plan.integratedDeductible
     ? plan.deductible * actuarialAssumptions.rxDeductibleAllocation
     : plan.deductible;
   const estimatedAnnualFills = actuarialAssumptions.estimatedAnnualFills;
@@ -346,38 +293,94 @@ function calculateTnMemberTotalCost(
 
   tnMemberTotalCost.forEach((cost, i) => {
     const n = i + 1;
-    const usesDeductible = `t${n}UsesDeductible` as keyof PlanInput;
-    const tnEffectiveDeductible = plan[usesDeductible]
-      ? effectiveDeductible
-      : 0;
+    const tnUsesDeductibleKey = `t${n}UsesDeductible` as keyof PlanInput;
+    const tnUsesDeductible = plan[tnUsesDeductibleKey] as boolean;
 
-    if (!usesDeductible) {
-      cost = tnFillTotal[i] * fillCost[i];
+    const tnGross = tnFillTotal[i] * fillCost[i];
+    memberTierRunningTotal += tnGross;
+
+    const tnShareType = `t${n}CostSharingType` as keyof PlanInput;
+    const tnShareValueKey = `t${n}ShareValue` as keyof PlanInput;
+    const tnShareValue = plan[tnShareValueKey] as number;
+
+    if (plan[tnShareType] === 'COPAY') {
+      const { member, dedApplied, rdExiting } = tierMemeberPaysCopay(
+        tnFillTotal[i],
+        tnShareValue,
+        tnUsesDeductible,
+        tnGross,
+        effectiveDeductible
+      );
+      cost = member;
+      effectiveDeductible = rdExiting;
     } else {
-      if (tnEffectiveDeductible >= tnFillTotal[i] * fillCost[i]) {
-        cost = tnFillTotal[i] * fillCost[i];
-      } else {
-        const tnShareType = `t${n}CostSharingType` as keyof PlanInput;
-        const tnShareValueKey = `t${n}ShareValue` as keyof PlanInput;
-        const tnShareValue = plan[tnShareValueKey] as number;
-        const remainingDeductible = Math.max(
-          0,
-          tnEffectiveDeductible - memberTierRunningTotal
+      const coinsurancePct = tnShareValue;
+      let dedApplied = 0;
+
+      const tnCapValueKey = `t${n}CapValue` as keyof PlanInput;
+      const tnCapValue = plan[tnCapValueKey] as number;
+
+      if (!tnUsesDeductible) {
+        const residual = tnGross;
+        const coinsuranceUncapped = residual * coinsurancePct;
+        const coinsuranceCapped = Math.min(
+          coinsuranceUncapped,
+          capLimit(tnFillTotal[i], tnCapValue)
         );
-        if (plan[tnShareType] === 'COPAY') {
-          cost = remainingDeductible + tnFillTotal[i] * tnShareValue;
+        cost = coinsuranceCapped;
+      } else {
+        dedApplied = Math.min(tnGross, effectiveDeductible);
+        const residual = tnGross - dedApplied;
+
+        if (dedApplied === tnGross) {
+          cost = tnGross;
+          effectiveDeductible -= dedApplied;
         } else {
-          cost =
-            remainingDeductible +
-            (tnFillTotal[i] * fillCost[i] - remainingDeductible) * tnShareValue;
-          console.log('cost 330', tnEffectiveDeductible);
+          const coinsuranceUncapped = residual * coinsurancePct;
+          const coinsuranceCapped = Math.min(
+            coinsuranceUncapped,
+            capLimit(tnFillTotal[i], tnCapValue)
+          );
+
+          cost = dedApplied + coinsuranceCapped;
+          effectiveDeductible -= dedApplied;
         }
       }
     }
-    console.log('cost === ', cost);
     tnMemberTotalCost[i] = cost;
-    memberTierRunningTotal += cost;
   });
 
   return tnMemberTotalCost;
+}
+
+function tierMemeberPaysCopay(
+  fills: number,
+  copayPerFill: number,
+  usesDeductible: boolean,
+  gross: number,
+  rdEntering: number
+): { member: number; dedApplied: number; rdExiting: number } {
+  if (!usesDeductible) {
+    return {
+      member: fills * copayPerFill,
+      dedApplied: 0,
+      rdExiting: rdEntering,
+    };
+  }
+  const dedApplied = Math.min(gross, rdEntering);
+  const residual = gross - dedApplied;
+  if (dedApplied === gross) {
+    // Still fully deductible
+    return { member: gross, dedApplied, rdExiting: rdEntering - dedApplied };
+  }
+
+  const member = dedApplied + fills * copayPerFill;
+  return { member, dedApplied, rdExiting: rdEntering - dedApplied };
+}
+
+function capLimit(fills: number, capValue: number): number {
+  if (capValue === null || capValue <= 0) {
+    return Infinity;
+  }
+  return fills * capValue;
 }

@@ -40,6 +40,11 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
     t3UsesDeductible: false,
     t4UsesDeductible: false,
 
+    t1CapValue: 0,
+    t2CapValue: 0,
+    t3CapValue: 0,
+    t4CapValue: 0,
+
     evaluationMethod: 'ACTUARIAL',
     actuarialAssumptions: {} as ActuarialAssumptionsInput,
   });
@@ -144,6 +149,16 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                       value={form[`t${tier}ShareValue` as keyof PlanFormData] as number}
                       onChange={(e) =>
                         handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value))
+                      }
+                    />
+                  </FormField>
+                  <FormField label={`Cap Value`} htmlFor={`t${tier}CapValue`}>
+                    <Input
+                      id={`t${tier}CapValue`}
+                      type="number"
+                      value={form[`t${tier}CapValue` as keyof PlanFormData] as number}
+                      onChange={(e) =>
+                        handleChange(`t${tier}CapValue` as keyof PlanFormData, parseFloat(e.target.value))
                       }
                     />
                   </FormField>

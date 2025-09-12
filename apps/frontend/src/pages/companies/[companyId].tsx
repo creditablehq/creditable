@@ -51,9 +51,11 @@ export default function CompanyDetail() {
         >
           + Add Plan
         </Button>
-        <Tooltip anchorSelect="#add-plan-btn" place="bottom">
-          Plan limit reached. Contact to increase plan maximum.
-        </Tooltip>
+        { disabled &&
+          <Tooltip anchorSelect="#add-plan-btn" place="bottom">
+            Plan limit reached. Contact to increase plan maximum.
+          </Tooltip>
+        }
       </div>
 
       {!plans.length && 

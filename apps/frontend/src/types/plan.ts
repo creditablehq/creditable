@@ -24,6 +24,11 @@ export interface PlanFormData {
   t3UsesDeductible: boolean;
   t4UsesDeductible: boolean;
 
+  t1CapValue: number;
+  t2CapValue: number;
+  t3CapValue: number;
+  t4CapValue: number;
+
   evaluationMethod: 'ACTUARIAL' | 'SIMPLIFIED';
 
   actuarialAssumptions: ActuarialAssumptionsInput;
