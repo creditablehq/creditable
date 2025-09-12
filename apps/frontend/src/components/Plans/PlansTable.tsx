@@ -15,7 +15,6 @@ export function PlansTable({ companyId }: PlansTableProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('useEffect triggered with token: ', auth?.token);
     if (!auth?.token) return;
 
     async function fetchPlans() {

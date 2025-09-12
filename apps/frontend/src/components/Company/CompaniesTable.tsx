@@ -23,7 +23,6 @@ export function CompaniesTable({ newCompany }: any) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('useEffect triggered with token: ', auth?.token);
     if (!auth?.token) return;
 
     async function fetchCompanies() {
