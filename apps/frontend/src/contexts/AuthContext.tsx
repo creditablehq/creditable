@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     localStorage.setItem('token', token ?? '');
+    setAuthToken(token);
     localStorage.setItem('user', JSON.stringify(user));
   }, [token, user]);
 
