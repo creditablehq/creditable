@@ -56,6 +56,9 @@ router.get('/:id/report', async (req, res) => {
     doc.moveDown();
 
     // Plan Overview
+    doc.fontSize(14).font('Helvetica-Bold').text('Plan Information');
+    doc.moveDown();
+
     doc
       .fontSize(12)
       .font('Helvetica-Bold')
@@ -88,7 +91,7 @@ router.get('/:id/report', async (req, res) => {
     doc.moveDown(2);
 
     // Plan Summary
-    doc.fontSize(14).font('Helvetica-Bold').text('Plan Summary Results');
+    doc.fontSize(14).font('Helvetica-Bold').text('Plan Summary');
     doc.moveDown();
 
     doc
@@ -100,47 +103,83 @@ router.get('/:id/report', async (req, res) => {
       .font('Helvetica-Bold')
       .text('Deductible: ', { continued: true })
       .font('Helvetica')
-      .text(`${plan.deductible}`);
-    doc
-      .font('Helvetica-Bold')
-      .text('Monthly Premium: ', { continued: true })
-      .font('Helvetica')
-      .text(`${plan.monthlyPremiumRx}`);
+      .text(`$${plan.deductible}`);
     doc
       .font('Helvetica-Bold')
       .text('MOOP: ', { continued: true })
       .font('Helvetica')
-      .text(`${plan.moop}`);
+      .text(`$${plan.moop}`);
+    doc
+      .font('Helvetica-Bold')
+      .text('Integrated Deductible: ', { continued: true })
+      .font('Helvetica')
+      .text(`${plan.integratedDeductible ? 'Yes' : 'No'}`);
     doc.moveDown();
 
-    doc.fontSize(16).text('Creditability Determination', {
-      underline: true,
-      align: 'center',
-    });
-    addDetermination(doc, evaluation as Evaluation);
+    doc
+      .moveTo(50, doc.y)
+      .lineWidth(1)
+      .strokeColor('#cccccc')
+      .lineTo(doc.page.width - 50, doc.y)
+      .stroke();
+    doc.moveDown(2);
+
+    // doc.fontSize(16).text('Creditability Determination', {
+    //   underline: true,
+    //   align: 'center',
+    // });
+    // addDetermination(doc, evaluation as Evaluation);
+
+    doc
+      .font('Helvetica-Bold')
+      .text('Determination: ', { continued: true })
+      .font('Helvetica')
+      .fillColor(evaluation?.isCreditable ? '#228B22' : '#FF0000')
+      .text(`${evaluation?.isCreditable ? 'Creditable' : 'Not Creditable'}`)
+      .fillColor('black');
 
     doc
       .font('Helvetica-Bold')
       .text('Projected Plan Pays (Actuarial Percentage): ', { continued: true })
       .font('Helvetica')
-      .text(`${(evaluation?.actuarialValue || 0) * 100}%`);
+      .text(`${((evaluation?.actuarialValue || 0) * 100).toFixed(1)}%`);
+
     doc
+      .moveDown(2)
+      .text('This plan has been determined to be ', { continued: true })
       .font('Helvetica-Bold')
-      .text('Test Applied: ', { continued: true })
-      .font('Helvetica')
-      .text(`CMS ${plan.year} ${evaluation?.method} Method`);
-    doc
-      .font('Helvetica-Bold')
-      .text('Model Basis: ', { continued: true })
-      .font('Helvetica')
-      .text(`CMS-aligned exposure modeling (based on 42 fills/year)`);
-    doc
-      .font('Helvetica-Bold')
-      .text('Assumptions: ', { continued: true })
+      .fillColor(evaluation?.isCreditable ? '#228B22' : '#FF0000')
+      .text(`${evaluation?.isCreditable ? 'Creditable' : 'NOT Creditable '}`, {
+        continued: true,
+      })
+      .fillColor('black')
       .font('Helvetica')
       .text(
-        `Industry-standard tier utilization and cost estimates, editable per plan sponsor`
+        ' Coverage under Medicare Part D rules. Based on the modeled results this plan is expected to pay ',
+        { continued: true }
+      )
+      .font('Helvetica-Bold')
+      .text(`${((evaluation?.actuarialValue || 0) * 100).toFixed(1)}% `, {
+        continued: true,
+      })
+      .font('Helvetica')
+      .text('of prescription drug costs which ', { continued: true })
+      .font('Helvetica-Bold')
+      .text(`${evaluation?.isCreditable ? 'does' : 'does not'}`, {
+        continued: true,
+      })
+      .font('Helvetica')
+      .text(
+        'meet or exceed CMS’s creditable coverage threshold for the applicable plan year.'
       );
+
+    doc
+      .moveDown(2)
+      .moveTo(50, doc.y)
+      .lineWidth(1)
+      .strokeColor('#cccccc')
+      .lineTo(doc.page.width - 50, doc.y)
+      .stroke();
 
     addFooter(doc);
 
@@ -170,49 +209,6 @@ function addWatermark(
   doc.opacity(1); // reset for normal content
 }
 
-function addDetermination(doc: PDFKit.PDFDocument, evaluation: Evaluation) {
-  const bgColor = evaluation.isCreditable ? '#d4edda' : '#f8d7da'; // greenish / reddish
-  const borderColor = evaluation.isCreditable ? '#155724' : '#721c24';
-  const textColor = borderColor;
-
-  // Box dimensions
-  const boxWidth = doc.page.width - 100; // 50px margin each side
-  const boxHeight = 60;
-  const x = 50;
-  const y = doc.y + 10;
-
-  // Draw filled rectangle
-  doc.save();
-  doc.rect(x, y, boxWidth, boxHeight).fill(bgColor);
-
-  // Draw border
-  doc
-    .lineWidth(2)
-    .strokeColor(borderColor)
-    .rect(x, y, boxWidth, boxHeight)
-    .stroke();
-
-  // Add text centered inside box
-  doc
-    .fillColor(textColor)
-    .fontSize(18)
-    .font('Helvetica-Bold')
-    .text(
-      `Plan is ${evaluation.isCreditable ? 'Creditable' : 'Non-Creditable'}`,
-      x,
-      y + 20,
-      { width: boxWidth, align: 'center' }
-    );
-  doc.restore();
-
-  doc
-    .fontSize(12)
-    .fillColor('black')
-    .text(evaluation.reasoning || '', { align: 'center' });
-
-  doc.moveDown(3); // add space after box
-}
-
 function addFooter(doc: PDFKit.PDFDocument) {
   doc.moveDown(4);
   doc.fontSize(10).font('Helvetica-Bold').text('Disclaimer');
@@ -221,7 +217,7 @@ function addFooter(doc: PDFKit.PDFDocument) {
     .fontSize(8)
     .font('Helvetica')
     .text(
-      'This report is generated using Creditable’s proprietary modeling tool built to align with CMS guidance under 42 CFR §423.56. All actuarial assumptions (e.g., tier cost, utilization rates, exposure modeling) are industry-standard and editable within the platform. Results are based on representative modeling, not claims data, and are intended solely to assist plan sponsors or their representatives in determining creditable coverage status.'
+      'This report has been prepared using Creditable’s proprietary actuarial testing engine in alignment with CMS guidance under 42 CFR §423.56 for determining Medicare Part D creditable coverage. The calculations are based on standardized actuarial assumptions regarding drug utilization, tier mix, and cost per fill that are widely accepted in the industry and permitted by CMS. These assumptions are transparent and fully editable within the platform; however, they do not constitute CMS-mandated safe harbors. No individual claims data or actuarial certification is required for employer-sponsored plans, and this report does not constitute legal advice or a formal actuarial opinion. The ultimate responsibility for the creditable coverage determination, and for providing required notices to Medicare-eligible individuals and disclosures to CMS, rests with the plan sponsor. This report is intended solely as a compliance support tool and should be retained with the plan’s records for audit purposes. All assumptions and calculation logic are documentd within the Creditable platform and available for audit upon request.'
     );
   doc.moveDown();
   doc
