@@ -9,14 +9,18 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isFailedLogin, setFailedLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     login({ email, password }).then(res => {
       setToken(res?.token);
       setUser(res?.user);
+      setLoading(false);
     }).catch(err => {
       setFailedLogin(true);
+      setLoading(false);
       console.error('Login failed:', err);
     });
   };
@@ -45,6 +49,7 @@ const LoginForm = () => {
       }
       <button
         type="submit"
+        disabled={loading}
         className="bg-brand text-white px-4 py-2 rounded w-40 hover:bg-brand-dark"
       >
         Login

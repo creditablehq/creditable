@@ -37,7 +37,7 @@ const AppContent = () => {
       {showAuthForm ? (
         <ModalAuthWrapper
           title={authMode === 'signup' ? 'Sign Up' : 'Log In'}
-          switchModeLabel={authMode === 'signup' ? 'Already have an account? Log In' : 'New user? Sign Up'}
+          // switchModeLabel={authMode === 'signup' ? 'Already have an account? Log In' : 'New user? Sign Up'}
           onSwitchMode={() => setAuthMode(authMode === 'signup' ? 'login' : 'signup')}
         >
           {authMode === 'signup' ? <SignupForm /> : <LoginForm />}

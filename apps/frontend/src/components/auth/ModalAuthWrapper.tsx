@@ -3,7 +3,7 @@ import React from 'react';
 interface ModalAuthWrapperProps {
   title: string;
   children: React.ReactNode;
-  switchModeLabel: string;
+  switchModeLabel?: string;
   onSwitchMode: () => void;
 }
 
@@ -20,14 +20,14 @@ const ModalAuthWrapper: React.FC<ModalAuthWrapperProps> = ({
           {title}
         </h2>
         {children}
-        <div className="mt-6 text-center">
+        {switchModeLabel && <div className="mt-6 text-center">
           <button
             onClick={onSwitchMode}
             className="text-sm text-brand hover:underline transition-colors"
           >
             {switchModeLabel}
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );
