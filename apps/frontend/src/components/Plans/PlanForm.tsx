@@ -1,6 +1,6 @@
 // components/plans/PlanForm.tsx
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '../design-system/Input';
 import { FormField } from '../design-system/FormField';
 import { Button } from '../design-system/Button';
@@ -18,11 +18,10 @@ interface PlanFormProps {
 export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
   const [form, setForm] = useState<PlanFormData>({
     name: '',
-    year: new Date().getFullYear(),
+    year: new Date().getFullYear() + 1,
     type: 'STANDARD',
     deductible: 0,
     moop: 0,
-    monthlyPremiumRx: 0,
     integratedDeductible: false,
 
     t1CostSharingType: 'COPAY',
@@ -83,6 +82,8 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
             <Input
               id="year"
               type="number"
+              step="1"
+              min={new Date().getFullYear()}
               value={form.year}
               onChange={(e) => handleChange('year', parseInt(e.target.value))}
             />
@@ -98,18 +99,11 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
               ]}
             />
           </div>
-          <FormField label="Monthly Premium (Rx only)" htmlFor="monthlyPremiumRx">
-            <Input
-              id="monthlyPremiumRx"
-              type="number"
-              value={form.monthlyPremiumRx}
-              onChange={(e) => handleChange('monthlyPremiumRx', parseFloat(e.target.value))}
-            />
-          </FormField>
           <FormField label="Deductible" htmlFor="deductible">
             <Input
               id="deductible"
               type="number"
+              step="1"
               value={form.deductible}
               onChange={(e) => handleChange('deductible', parseFloat(e.target.value))}
             />
@@ -118,6 +112,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
             <Input
               id="moop"
               type="number"
+              step="1"
               value={form.moop}
               onChange={(e) => handleChange('moop', parseFloat(e.target.value))}
             />
@@ -125,7 +120,6 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
         </div>
 
         <fieldset className="space-y-4 border-t pt-6">
-          {/* <legend className="text-lg font-medium">Tier Cost Share</legend> */}
           <h3 className="text-lg font-medium">Tier Cost Share</h3>
           {[1, 2, 3, 4].map((tier, i) => (
             <div key={i} className="flex flex-col">
@@ -146,16 +140,20 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                     <Input
                       id={`t${tier}ShareValue`}
                       type="number"
+                      step="1"
+                      min="0"
                       value={form[`t${tier}ShareValue` as keyof PlanFormData] as number}
                       onChange={(e) =>
-                        handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value))
+                        handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value) / 100)
                       }
+                      unit={form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? '%' : ''}
                     />
                   </FormField>
-                  <FormField label={`Cap Value`} htmlFor={`t${tier}CapValue`}>
+                  <FormField label={`Cap Limit`} htmlFor={`t${tier}CapValue`}>
                     <Input
                       id={`t${tier}CapValue`}
                       type="number"
+                      step="1"
                       value={form[`t${tier}CapValue` as keyof PlanFormData] as number}
                       onChange={(e) =>
                         handleChange(`t${tier}CapValue` as keyof PlanFormData, parseFloat(e.target.value))

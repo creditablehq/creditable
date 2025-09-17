@@ -6,7 +6,6 @@ export interface PlanFormData {
   type: 'STANDARD' | 'HIGH_DEDUCTIBLE';
   deductible: number;
   moop: number;
-  monthlyPremiumRx: number;
   integratedDeductible: boolean;
 
   t1CostSharingType: 'COPAY' | 'COINSURANCE';
