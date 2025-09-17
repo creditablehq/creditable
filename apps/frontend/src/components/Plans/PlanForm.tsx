@@ -142,7 +142,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                       type="number"
                       step="1"
                       min="0"
-                      value={form[`t${tier}ShareValue` as keyof PlanFormData] as number}
+                      value={(form[`t${tier}ShareValue` as keyof PlanFormData] as number) * 100}
                       onChange={(e) =>
                         handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value) / 100)
                       }
