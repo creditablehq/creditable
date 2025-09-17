@@ -13,7 +13,6 @@ type PlanCardProps = {
     type: string;
     deductible: number;
     moop: number;
-    monthlyPremiumRx: number;
     integratedDeductible: boolean;
 
     t1CostSharingType: 'COPAY' | 'COINSURANCE';
@@ -114,7 +113,6 @@ export default function PlanCard({ plan }: PlanCardProps) {
           <div className="grid grid-cols-3 gap-4 text-sm pt-2">
             <div className="flex"><strong>Year:</strong><div className="w-full pl-14">{plan.year}</div></div>
             <div className="flex"><strong>Plan Type:</strong><div className="pl-4">{plan.type}</div></div>
-            <div className="flex"><strong>Premium:</strong><div className="w-full pl-24">${plan.monthlyPremiumRx}</div></div>
             <div className="flex"><strong>Deductible:</strong><div className="w-full pl-2">${plan.deductible}</div></div>
             <div className="flex"><strong>MOOP:</strong> <div className="w-full pl-10">${plan.moop}</div></div>
             <div className="flex"><strong>Integrated Deductible:</strong><div className="pl-2">{plan.integratedDeductible ? 'Yes' : 'No'}</div></div>

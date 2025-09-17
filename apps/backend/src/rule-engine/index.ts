@@ -7,7 +7,6 @@ export interface PlanInput {
   type: 'STANDARD' | 'HIGH_DEDUCTIBLE';
   deductible: number;
   moop: number;
-  monthlyPremiumRx: number;
   integratedDeductible: boolean;
 
   t1CostSharingType: 'COPAY' | 'COINSURANCE';
@@ -150,8 +149,6 @@ function evaluateActuarial(
   plan: PlanInput,
   actuarialAssumptions: ActuarialAssumptions
 ): EvaluationResult {
-  const { deductible, moop, monthlyPremiumRx, t1ShareValue } = plan;
-
   // 🧠 Example rules — replace these with real rules as needed
   const grossCost = calculateGrossCost(actuarialAssumptions);
   const planPays = calculatePlanPays(grossCost, plan, actuarialAssumptions);
