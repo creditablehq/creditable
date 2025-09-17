@@ -54,13 +54,12 @@ model Plan {
   id                   String        @id @default(uuid())
   name                 String
   year                 Int
-  deductible           Float?
-  moop                 Float?
+  deductible           Int?
+  moop                 Int?
   t1CostSharingType    CostShareType
   t2CostSharingType    CostShareType
   t3CostSharingType    CostShareType
   t4CostSharingType    CostShareType
-  monthlyPremiumRx     Float?
   integratedDeductible Boolean       @default(false)
   t1ShareValue         Float?
   t2ShareValue         Float?
