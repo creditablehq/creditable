@@ -9,7 +9,8 @@ interface ExtractedBrokerData extends Record<string, ReactNode> {
   id: string,
   Name: string,
   Users: number,
-  Plans: number,
+  'Current Plans': number,
+  'Total Plans': number,
   'Broker Since': string,
 };
 
@@ -36,16 +37,7 @@ export function BrokersTable({ newBroker }: any) {
     }
 
     fetchBrokers();
-  }, [auth?.token]);
-
-  useEffect(() => {
-    if (newBroker) {
-      setLoading(true);
-      const mappedBrokers = mapBrokers([...brokers, newBroker])
-      setBrokers(mappedBrokers);
-      setLoading(false);
-    }
-  }, [newBroker])
+  }, [auth?.token, newBroker]);
 
   const mapBrokers = (brokers: any[]) => {
     return brokers?.map(b => {
@@ -53,7 +45,8 @@ export function BrokersTable({ newBroker }: any) {
         id: b?.id,
         Name: b?.name,
         Users: b?.users?.length ?? 0,
-        Plans: b?.planLimit,
+        'Current Plans': b?.currentPlanCount,
+        'Total Plans': b?.planLimit,
         'Broker Since': new Date(b?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
       };
       return extractedBroker;
@@ -66,7 +59,7 @@ export function BrokersTable({ newBroker }: any) {
   return (
     brokers &&
     <Table
-      columns={['Name', 'Users', 'Plans', 'Broker Since']}
+      columns={['Name', 'Users', 'Current Plans', 'Total Plans', 'Broker Since']}
       data={brokers}
       emptyMessage='No clients.'
     />
