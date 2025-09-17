@@ -50,7 +50,7 @@ const LoginForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="bg-brand text-white px-4 py-2 rounded w-40 hover:bg-brand-dark"
+        className="bg-brand text-white px-4 py-2 rounded w-40 hover:bg-brand-dark disabled:cursor-progress disabled:border disabled:border-muted-100 disabled:text-muted-100 disabled:dark:border-muted-900 disabled:dark:text-muted-900"
       >
         Login
       </button>
