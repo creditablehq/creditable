@@ -144,7 +144,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                       min="0"
                       value={(form[`t${tier}ShareValue` as keyof PlanFormData] as number) * 100}
                       onChange={(e) =>
-                        handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value) / 100)
+                        handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value) / (form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? 100 : 1))
                       }
                       unit={form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? '%' : ''}
                     />
