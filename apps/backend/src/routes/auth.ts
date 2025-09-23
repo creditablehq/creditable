@@ -99,4 +99,47 @@ router.put('/update-user/:id', async (req: Request, res: Response) => {
   }
 });
 
+router.put('/reset-password/:id', async (req: Request, res: Response) => {
+  const { tempPassword } = req.body;
+  const { id } = req.params;
+  const role = req.user?.role;
+
+  if (role !== 'ADMIN') return;
+
+  if (!tempPassword) {
+    return res.status(400).json({ message: 'Missing password' });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { broker: true },
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Cannot find user.' });
+    }
+
+    const hashed = await hashPassword(tempPassword);
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        password: tempPassword ? hashed : undefined,
+      },
+    });
+
+    const token = createJWT({
+      id: updatedUser.id,
+      email: updatedUser.email,
+      brokerId: updatedUser.brokerId,
+      role: updatedUser.role,
+    });
+    res.json({ token, updatedUser });
+  } catch (error) {
+    console.error('[login error]', error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+});
+
 export default router;
