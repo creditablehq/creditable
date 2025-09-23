@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { PlanFormData } from '../../types/plan';
 import { PlanForm } from '../../components/Plans/PlanForm';
-import { PlansTable } from '../../components/Plans/PlansTable';
 import { getPlansByCompany } from '../../api/plans';
 import { getCompanyById } from '../../api/companies';
 import { Modal } from '../../components/design-system/Modal';
@@ -38,6 +37,10 @@ export default function CompanyDetail() {
     setDisabled(me?.broker?.currentPlanCount >= me?.broker?.planLimit)
   }, [me])
 
+  const updatePlans = (id: string) => {
+    setPlans(prevPlans => prevPlans?.filter(plan => plan?.id !== id) || null);
+  }
+
   if (loading) return <p>Loading company info...</p>;
 
   return (
@@ -63,7 +66,7 @@ export default function CompanyDetail() {
       }
 
       {plans.length > 0 && plans.map((plan: any) => {
-        return (<PlanCard key={plan?.id} plan={plan} />);
+        return (<PlanCard key={plan?.id} plan={plan} onDelete={updatePlans} />);
       })}
 
       <Modal open={isOpen} onClose={() => setIsOpen(false)} title="Create Plan">

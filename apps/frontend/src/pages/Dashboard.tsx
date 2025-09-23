@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Button } from "../components/design-system";
 import { getMe } from "../api/user";
 import PlanCard from "../components/Company/PlanCard";
 
@@ -21,6 +20,10 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
 
+  const updatePlans = (id: string) => {
+    setPlans(prevPlans => prevPlans?.filter(plan => plan.id !== id) || null);
+  }
+
   return (
     <div className="text-gray-800">
       <div className="flex justify-between items-center mb-4">
@@ -31,7 +34,7 @@ const Dashboard = () => {
           <section className="flex flex-col gap-2 bg-white dark:bg-neutral-800 p-4 sm:p-8 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700">
             <h3 className="text-lg font-semibold mb-2">Recently Added Plans</h3>
             {plans?.map((plan: any) => {
-              return (<PlanCard key={plan?.id} plan={plan} />)
+              return (<PlanCard key={plan?.id} plan={plan} onDelete={updatePlans} />)
             })}
             <p className="mt-4">Don't see a specific plan? <a href="/companies">Try looking for it under a client</a>!</p>
           </section>

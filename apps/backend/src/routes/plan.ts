@@ -4,7 +4,6 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
 import PDFDocument from 'pdfkit';
-import { Evaluation } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 
@@ -186,6 +185,44 @@ router.get('/:id/report', async (req, res) => {
     doc.end();
   } catch (error) {
     console.error('[GET] /plans/:id/report', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name } = req?.body?.name;
+  const brokerId = req?.user?.brokerId;
+
+  try {
+    const plan = await prisma.plan.findFirst({
+      where: {
+        id,
+        name,
+      },
+    });
+
+    if (!plan) return res.status(404).json({ message: 'Plan not found' });
+
+    const deletedPlan = await prisma.plan.delete({ where: { id } });
+
+    if (deletedPlan) {
+      if (brokerId) {
+        await prisma.broker.update({
+          where: { id: brokerId },
+          data: {
+            currentPlanCount: {
+              decrement: 1,
+            },
+          },
+        });
+      }
+      res.status(204).send();
+    } else {
+      res.status(404).json({ message: `Could not find plan: ${id}` });
+    }
+  } catch (error) {
+    console.error(`[DELETE /companies/${id}]`, error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

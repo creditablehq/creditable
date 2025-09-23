@@ -38,6 +38,23 @@ export async function createPlan(companyId: string, data: any) {
   return res.json();
 }
 
+export async function deletePlan(id: string, name: string) {
+  const token = getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/plans/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to delete plan');
+  }
+}
+
 export async function getReport(id: string, action: 'view' | 'download') {
   if (!action) throw new Error('Failed to fetch report, no action specified.');
 

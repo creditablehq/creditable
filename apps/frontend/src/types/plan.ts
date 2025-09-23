@@ -1,6 +1,7 @@
 import { ActuarialAssumptionsInput } from '../components/layout/ActuarialAssumptionsModal';
 
 export interface PlanFormData {
+  id?: string;
   name: string;
   year: number;
   type: 'STANDARD' | 'HIGH_DEDUCTIBLE';
@@ -32,3 +33,5 @@ export interface PlanFormData {
 
   actuarialAssumptions: ActuarialAssumptionsInput;
 }
+
+export type CreditabilityStatus = 'CREDITABLE' | 'NON_CREDITABLE' | 'UNKNOWN';
