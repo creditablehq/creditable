@@ -34,4 +34,32 @@ router.get('/me', async (req, res) => {
   }
 });
 
+router.get('/', async (req, res) => {
+  const role = req.user?.role;
+
+  if (role !== 'ADMIN') return;
+
+  try {
+    const users = await prisma.user.findMany({
+      include: {
+        plans: {
+          include: {
+            evaluations: true,
+          },
+        },
+        broker: true,
+      },
+    });
+    if (users) {
+      return res.json(users);
+    }
+
+    return res.status(404).json({ message: 'Error getting users' });
+  } catch (e) {
+    console.error('[GET /users]', e);
+    res
+      .status(500)
+      .json({ message: 'Internal server error: Failed to get /users' });
+  }
+});
 export default router;

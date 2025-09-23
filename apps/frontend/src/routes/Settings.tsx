@@ -59,7 +59,9 @@ export function Settings() {
     handleChange('newPassword', '');
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
     try {
       const { token, updatedUser } = await updateUser(user.id, form);
       setToken(token);
@@ -95,6 +97,7 @@ export function Settings() {
           id="password"
           value={form.password}
           type="password"
+          name="password"
           required
           onChange={(e) => handleChange('password', e.target.value)}
         />
@@ -104,6 +107,7 @@ export function Settings() {
           id="newPassword"
           value={form.newPassword}
           type="password"
+          name="newPassword"
           onChange={(e) => handleChange('newPassword', e.target.value)}
         />
       </Label>
