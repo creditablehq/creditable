@@ -104,7 +104,7 @@ router.put('/reset-password/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const role = req.user?.role;
 
-  if (role !== 'ADMIN') return;
+  if (role !== 'ADMIN') return res.status(403).json({ message: 'Forbidden' });
 
   if (!tempPassword) {
     return res.status(400).json({ message: 'Missing password' });
