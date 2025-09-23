@@ -87,7 +87,7 @@ model Plan {
 
 model Evaluation {
   id                   String              @id @default(uuid())
-  plan                 Plan                @relation(fields: [planId], references: [id])
+  plan                 Plan                @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId               String
   method               DeterminationMethod
   result               CreditabilityStatus
