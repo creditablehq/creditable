@@ -14,17 +14,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String
-  password  String
-  role      Role      @default(BROKER)
-  brokerId  String
-  broker    Broker    @relation(fields: [brokerId], references: [id])
-  companies Company[]
-  plans     Plan[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String          @id @default(cuid())
+  email          String          @unique
+  name           String
+  password       String
+  role           Role            @default(BROKER)
+  brokerId       String
+  broker         Broker          @relation(fields: [brokerId], references: [id])
+  companies      Company[]
+  plans          Plan[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  SupportTickets SupportTicket[]
 }
 
 model Broker {
@@ -98,6 +99,15 @@ model Evaluation {
   createdAt            DateTime            @default(now())
 }
 
+model SupportTicket {
+  id        String            @id @default(uuid())
+  type      SupportTicketType
+  message   String
+  user      User?             @relation(fields: [userId], references: [id])
+  userId    String?
+  createdAt DateTime          @default(now())
+}
+
 enum Role {
   BROKER
   ADMIN
@@ -122,4 +132,9 @@ enum PlanType {
 enum CostShareType {
   COPAY
   COINSURANCE
+}
+
+enum SupportTicketType {
+  FEATURE_REQUEST
+  BUG
 }
