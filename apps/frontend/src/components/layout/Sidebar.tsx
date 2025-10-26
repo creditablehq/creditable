@@ -60,6 +60,14 @@ const Sidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           >
             Brokers
           </NavLink>}
+          {user?.role === 'ADMIN' && <NavLink
+            to="/feedback"
+            className={({ isActive }) =>
+              isActive ? 'text-brand font-medium' : 'text-neutral-700 dark:text-neutral-300'
+            }
+          >
+            Feedback
+          </NavLink>}
           <NavLink
             to="/settings"
             className={({ isActive }) =>

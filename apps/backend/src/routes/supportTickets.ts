@@ -5,8 +5,26 @@ import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth m
 
 const router = Router() as Router;
 
-// Apply auth middleware to all company routes
 router.use(authMiddleware);
+
+// GET /supportTickets - get all support tickets
+router.get('/', async (req, res) => {
+  const user = req.user;
+
+  try {
+    if (user?.role === 'ADMIN') {
+      const supportTickets = await prisma.supportTicket.findMany({
+        include: { user: true },
+      });
+      res.json(supportTickets);
+    } else {
+      res.status(403).json({ message: 'Not allowed' });
+    }
+  } catch (error) {
+    console.error('[GET /supportTickets]', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // POST /supportTickets - create new support request
 router.post('/', async (req, res) => {

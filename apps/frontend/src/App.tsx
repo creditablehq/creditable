@@ -13,6 +13,7 @@ import CompanyDetail from './pages/companies/[companyId]';
 import { Settings } from './routes/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
+import { Feedback } from './routes/Feedback';
 
 const AppContent = () => {
   const { token } = useAuth();
@@ -51,6 +52,9 @@ const AppContent = () => {
               {/* <Route index element={<Navigate to="clients" />} /> */}
               <Route path="/companies" element={<Clients />} />
               <Route path="/companies/:companyId" element={<CompanyDetail />} />
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                <Route path="/feedback" element={<Feedback />} />
+              </Route>
               <Route path="/settings" element={<Settings />} />
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/brokers" element={<Brokers />} />
