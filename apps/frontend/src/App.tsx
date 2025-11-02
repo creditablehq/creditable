@@ -14,6 +14,7 @@ import { Settings } from './routes/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import { Feedback } from './routes/Feedback';
+import BrokerDetail from './pages/brokers/[brokerId]';
 
 const AppContent = () => {
   const { token } = useAuth();
@@ -58,6 +59,7 @@ const AppContent = () => {
               <Route path="/settings" element={<Settings />} />
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/brokers" element={<Brokers />} />
+                <Route path="/brokers/:brokerId" element={<BrokerDetail />} />
               </Route>
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/style-guide" element={<StyleGuide />} />

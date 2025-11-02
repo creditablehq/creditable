@@ -45,3 +45,20 @@ export async function createBroker(data: BrokerFormInput) {
     throw new Error('Error creating broker: ', e);
   }
 }
+
+export async function getBrokerById(id: string) {
+  const token = getAuthToken();
+  if (token) {
+    const res = await fetch(`${API_BASE_URL}/brokers/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch brokers');
+    }
+
+    return res.json();
+  }
+}

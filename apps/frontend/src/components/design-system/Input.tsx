@@ -32,6 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          type={props.type}
           className={cn(
             clsx(
               'w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors',

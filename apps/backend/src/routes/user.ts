@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
+import { hashPassword } from '../services/auth';
 
 const router = Router() as Router;
 
@@ -60,6 +61,38 @@ router.get('/', async (req, res) => {
     res
       .status(500)
       .json({ message: 'Internal server error: Failed to get /users' });
+  }
+});
+
+router.post('/', async (req, res) => {
+  const reqRole = req.user?.role;
+  const { name, email, role, brokerId } = req.body;
+
+  if (reqRole !== 'ADMIN') return;
+
+  try {
+    const tempPassword = `CreditablePartner${new Date().getFullYear()}!`;
+    const password = await hashPassword(tempPassword);
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        brokerId,
+        password,
+        role,
+      },
+    });
+
+    if (user) {
+      return res.json(user);
+    }
+
+    return res.status(400).json({ message: 'Error creating user' });
+  } catch (e) {
+    console.error('[POST /users]', e);
+    res
+      .status(500)
+      .json({ message: 'Internal server error: Failed to post /users' });
   }
 });
 export default router;

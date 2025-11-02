@@ -4,6 +4,7 @@ import { ReactNode, useContext, useEffect, useState } from 'react';
 import { getBrokers } from '../../api/brokers';
 import { Table } from '../design-system/Table';
 import { AuthContext } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface ExtractedBrokerData extends Record<string, ReactNode> {
   id: string,
@@ -20,6 +21,7 @@ export function BrokersTable({ newBroker }: any) {
   const [error, setError] = useState<string | null>(null);
 
   const auth = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchBrokers() {
@@ -47,7 +49,7 @@ export function BrokersTable({ newBroker }: any) {
         Users: b?.users?.length ?? 0,
         'Current Plans': b?.currentPlanCount,
         'Total Plans': b?.planLimit,
-        'Broker Since': new Date(b?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
+        'Broker Since': new Date(b?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
       };
       return extractedBroker;
     })
@@ -62,6 +64,7 @@ export function BrokersTable({ newBroker }: any) {
       columns={['Name', 'Users', 'Current Plans', 'Total Plans', 'Broker Since']}
       data={brokers}
       emptyMessage='No clients.'
+      onRowClick={(row: any) => navigate(`/brokers/${row?.id}`)}
     />
   );
 }

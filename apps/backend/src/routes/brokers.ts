@@ -24,6 +24,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /brokers/:id - get broker by id
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const broker = await prisma.broker.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        users: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    res.json(broker);
+  } catch (error) {
+    console.error('[GET /brokers]', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 router.post('/', async (req, res) => {
   const { name, totalPlans, userName, email, password } = req.body;
 

@@ -25,7 +25,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/companies', companyRouter);
 app.use('/api/plans', planRouter);
 app.use('/api/brokers', brokerRouter);
-app.use('/api/user', userRouter);
+app.use('/api/users', userRouter);
 app.use('/api/supportTickets', supportTicketRouter);
 
 app.get('/', (_req, res) => {
