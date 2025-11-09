@@ -35,12 +35,11 @@ export default function BrokerDetail() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     if (brokerId) {
       updateBrokerById(brokerId, { isPaywalled: isPaywalled })
       .then(res => {
         setBroker(res);
-      }).finally(() => setLoading(false));
+      });
     }
   }, [isPaywalled])
 
