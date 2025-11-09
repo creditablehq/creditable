@@ -66,7 +66,7 @@ export default function CompanyDetail() {
       }
 
       {plans.length > 0 && plans.map((plan: any) => {
-        return (<PlanCard key={plan?.id} plan={plan} onDelete={updatePlans} />);
+        return (<PlanCard key={plan?.id} plan={plan} disabledActions={me.broker?.isPaywalled || false} onDelete={updatePlans} />);
       })}
 
       <Modal open={isOpen} onClose={() => setIsOpen(false)} title="Create Plan">

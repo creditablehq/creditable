@@ -1,31 +1,48 @@
 import { useEffect, useState } from "react"
-import { getBrokerById, getBrokers } from "../../api/brokers"
+import { getBrokerById, updateBrokerById } from "../../api/brokers"
 import { useNavigate, useParams } from "react-router-dom"
-import { ArrowLeftCircle, UserPlus } from "lucide-react";
+import { ArrowLeftCircle, Eye, EyeOff } from "lucide-react";
+import {  } from 'lucide-react';
+
 import { Broker } from "../../types/Broker";
 import clsx from "clsx";
 import { Button } from "../../components/design-system";
 import { Modal } from "../../components/design-system/Modal";
 import { AddUserForm } from "../../components/Broker/AddUserForm";
 import { User } from "../../types/User";
+import { Tooltip } from "react-tooltip";
 
 export default function BrokerDetail() {
   const { brokerId } = useParams();
   const [loading, setLoading] = useState(true);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [broker, setBroker] = useState<Broker | undefined>(undefined);
+  const [isPaywalled, setIsPaywalled] = useState(broker?.isPaywalled);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     async function initBrokerInfo() {
-      getBrokerById(brokerId!).then(setBroker);
+      getBrokerById(brokerId!).then((res) => {
+        setBroker(res);
+        setIsPaywalled(res?.isPaywalled);
+      });
     }
 
     initBrokerInfo().finally(() => {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    if (brokerId) {
+      updateBrokerById(brokerId, { isPaywalled: isPaywalled })
+      .then(res => {
+        setBroker(res);
+      }).finally(() => setLoading(false));
+    }
+  }, [isPaywalled])
 
   const calculatedUtilizationPercentage = () => {
     return ((broker?.currentPlanCount || 0) / (broker?.planLimit || 0)) * 100;
@@ -50,9 +67,13 @@ export default function BrokerDetail() {
   const handleUserCreate = (user: User) => {
     setBroker(prev => {
       if (!prev) return prev;
-      return { ...prev, users: [...prev.users, user] }
+      return { ...prev, users: [...prev.users || [], user] }
     });
     setIsAddUserOpen(false);
+  }
+
+  const handleClickPaywall = () => {
+    setIsPaywalled(prev => !prev);
   }
 
   if (loading) return <p>Loading broker info...</p>;
@@ -60,7 +81,7 @@ export default function BrokerDetail() {
   return (
     <div className="space-y-6">
       <div 
-        className="flex gap-1 mb-4 text-neutral-400 hover:text-brand hover:cursor-pointer"
+        className="flex gap-1 w-fit mb-4 text-neutral-400 hover:text-brand hover:cursor-pointer"
         onClick={() => navigate('/brokers')}
       >
         <ArrowLeftCircle strokeWidth={1.25} />
@@ -71,6 +92,30 @@ export default function BrokerDetail() {
           <h1 className="text-2xl text-neutral-700 font-semibold italic">{broker?.name}</h1>
           <p className="text-xs text-neutral-400 font-light italic">{ broker?.id }</p>
         </div>
+        {broker?.isPaywalled ?
+          <div
+            id="paywall-mode-enabled"
+            className="flex gap-2 text-red-500 cursor-pointer"
+            onClick={handleClickPaywall}
+          >
+            <span>Broker Paywalled</span>
+            <EyeOff />
+          </div> :
+          <div
+            id="paywall-mode-disabled"
+            className="flex gap-2 text-green-600 cursor-pointer"
+            onClick={handleClickPaywall}
+          >
+            <span>Full Access</span>
+            <Eye />
+          </div>
+        }
+        <Tooltip anchorSelect="#paywall-mode-enabled" place="top">
+          Key actions such as viewing and downloading plan evaluations are disabled
+        </Tooltip>
+        <Tooltip anchorSelect="#paywall-mode-disabled" place="top">
+          Key actions such as viewing and downloading plan evaluations are enabled
+        </Tooltip>
       </div>
 
       <div className="flex gap-4 justify-items-stretch w-full overflow-hidden flex-wrap">

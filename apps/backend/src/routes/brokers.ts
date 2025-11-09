@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { hashPassword } from '../services/auth';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
+import { Prisma } from '@prisma/client';
 
 const router = Router() as Router;
 
@@ -72,6 +73,33 @@ router.post('/', async (req, res) => {
   });
 
   res.status(201).json(broker);
+});
+
+router.patch('/:id', async (req, res) => {
+  const brokerId = req.params.id;
+
+  const data = req.body;
+
+  try {
+    const updatedBroker = await prisma.broker.update({
+      where: { id: brokerId },
+      data,
+      include: {
+        users: true,
+      },
+    });
+
+    res.json(updatedBroker);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2025'
+    ) {
+      return res.status(404).json({ error: 'Broker not found' });
+    }
+    console.error('[PATCH /brokers/:id]', error);
+    res.status(500).json({ error: 'Failed to update broker' });
+  }
 });
 
 export default router;

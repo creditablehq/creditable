@@ -37,6 +37,7 @@ model Broker {
   currentPlanCount Int       @default(0)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  isPaywalled      Boolean   @default(false)
 }
 
 model Company {

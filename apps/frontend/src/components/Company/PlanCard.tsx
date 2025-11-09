@@ -45,10 +45,11 @@ type PlanCardProps = {
       createdAt: Date;
     }[];
   };
+  disabledActions: boolean;
   onDelete: (id: string) => void;
 };
 
-export default function PlanCard({ plan, onDelete }: PlanCardProps) {
+export default function PlanCard({ plan, disabledActions, onDelete }: PlanCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -95,43 +96,49 @@ export default function PlanCard({ plan, onDelete }: PlanCardProps) {
         >
           <div>
             <h3 className="font-semibold cursor-pointer" onClick={() => setExpanded((prev) => !prev)}>{plan.name} ({plan.year})</h3>
-            <div className="flex flex-row gap-2">
-              <Badge
-                variant={
-                  latestEvaluation?.isCreditable
-                    ? 'success'
-                    : !latestEvaluation?.isCreditable
-                    ? 'destructive'
-                    : 'secondary'
-                }
-              >
-                {latestEvaluation?.isCreditable ? 'CREDITABLE' : !latestEvaluation?.isCreditable ? 'NOT CREDITABLE' : 'Unknown'}
-              </Badge>
-              {latestEvaluation.actuarialValue &&
-              <>
+            {!disabledActions &&
+              <div className="flex flex-row gap-2">
                 <Badge
-                  id={`av-anchor-${plan.id}`}
                   variant={
-                    latestEvaluation?.result === 'CREDITABLE'
+                    latestEvaluation?.isCreditable
                       ? 'success'
-                      : latestEvaluation?.result === 'NON_CREDITABLE'
+                      : !latestEvaluation?.isCreditable
                       ? 'destructive'
                       : 'secondary'
                   }
                 >
-                  {(latestEvaluation?.actuarialValue * 100).toFixed(1)}%
+                  {latestEvaluation?.isCreditable ? 'CREDITABLE' : !latestEvaluation?.isCreditable ? 'NOT CREDITABLE' : 'Unknown'}
                 </Badge>
-                <Tooltip anchorSelect={`#av-anchor-${plan.id}`} place="bottom" style={{zIndex: '999'}}>
-                {latestEvaluation.reasoning}
-                </Tooltip>
-              </>
-              }
-            </div>
+                {latestEvaluation.actuarialValue &&
+                  <>
+                    <Badge
+                      id={`av-anchor-${plan.id}`}
+                      variant={
+                        latestEvaluation?.result === 'CREDITABLE'
+                          ? 'success'
+                          : latestEvaluation?.result === 'NON_CREDITABLE'
+                          ? 'destructive'
+                          : 'secondary'
+                      }
+                    >
+                      {(latestEvaluation?.actuarialValue * 100).toFixed(1)}%
+                    </Badge>
+                    <Tooltip anchorSelect={`#av-anchor-${plan.id}`} place="bottom" style={{zIndex: '999'}}>
+                    {latestEvaluation.reasoning}
+                    </Tooltip>
+                  </>
+                }
+              </div>
+            }
           </div>
           <div className="flex flex-row gap-4">
             <Trash2 size={20} id="delete-anchor" className="cursor-pointer text-red-500" onClick={() => setDeleteModalOpen(true)} />
-            <Eye size={20} id="view-anchor" className="cursor-pointer" onClick={() => handleDownload('view')} />
-            <Download size={20} id="download-anchor" className="cursor-pointer" onClick={() => handleDownload('download')} />
+            {!disabledActions &&
+              <>
+                <Eye size={20} id="view-anchor" className="cursor-pointer" onClick={() => handleDownload('view')} />
+                <Download size={20} id="download-anchor" className="cursor-pointer" onClick={() => handleDownload('download')} />
+              </>
+            }
             <Tooltip anchorSelect="#delete-anchor" place="bottom">
               Delete Plan
             </Tooltip>

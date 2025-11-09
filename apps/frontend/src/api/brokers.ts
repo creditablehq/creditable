@@ -1,4 +1,5 @@
 import { getAuthToken } from '../../lib/authToken';
+import { Broker } from '../types/Broker';
 import { BrokerFormInput } from '../types/BrokerForm';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -57,6 +58,27 @@ export async function getBrokerById(id: string) {
 
     if (!res.ok) {
       throw new Error('Failed to fetch brokers');
+    }
+
+    return res.json();
+  }
+}
+
+export async function updateBrokerById(id: string, brokerData: Broker) {
+  const token = getAuthToken();
+
+  if (token) {
+    const res = await fetch(`${API_BASE_URL}/brokers/${id}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(brokerData),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to update broker');
     }
 
     return res.json();
