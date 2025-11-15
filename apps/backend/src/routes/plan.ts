@@ -97,7 +97,7 @@ router.get('/:id/report', async (req, res) => {
       .fontSize(12)
       .text('Type: ', { continued: true })
       .font('Helvetica')
-      .text(`${plan.type}`);
+      .text(`${capitalize(plan.type)}`);
     doc
       .font('Helvetica-Bold')
       .text('Deductible: ', { continued: true })
@@ -139,7 +139,7 @@ router.get('/:id/report', async (req, res) => {
 
     doc
       .font('Helvetica-Bold')
-      .text('Projected Plan Pays (Actuarial Percentage): ', { continued: true })
+      .text('Expected Plan Payment: ', { continued: true })
       .font('Helvetica')
       .text(`${((evaluation?.actuarialValue || 0) * 100).toFixed(1)}%`);
 
@@ -254,7 +254,7 @@ function addFooter(doc: PDFKit.PDFDocument) {
     .fontSize(8)
     .font('Helvetica')
     .text(
-      'This report has been prepared using Creditable’s proprietary actuarial testing engine in alignment with CMS guidance under 42 CFR §423.56 for determining Medicare Part D creditable coverage. The calculations are based on standardized actuarial assumptions regarding drug utilization, tier mix, and cost per fill that are widely accepted in the industry and permitted by CMS. These assumptions are transparent and fully editable within the platform; however, they do not constitute CMS-mandated safe harbors. No individual claims data or actuarial certification is required for employer-sponsored plans, and this report does not constitute legal advice or a formal actuarial opinion. The ultimate responsibility for the creditable coverage determination, and for providing required notices to Medicare-eligible individuals and disclosures to CMS, rests with the plan sponsor. This report is intended solely as a compliance support tool and should be retained with the plan’s records for audit purposes. All assumptions and calculation logic are documentd within the Creditable platform and available for audit upon request.'
+      'This report has been prepared using Creditable’s calculation methodology in alignment with CMS guidance under 42 CFR §423.56 for determining Medicare Part D creditable coverage. The calculations are based on standardized assumptions regarding drug utilization, tier mix, and cost per fill that are widely accepted in the industry and permitted by CMS. These assumptions are transparent and fully editable within the platform; however, they do not constitute CMS-mandated safe harbors. No individual claims data or certification is required for employer-sponsored plans, and this report does not constitute legal advice or a formal actuarial opinion. The ultimate responsibility for the creditable coverage determination, and for providing required notices to Medicare-eligible individuals and disclosures to CMS, rests with the plan sponsor. This report is intended solely as a compliance support tool and should be retained with the plan’s records for audit purposes. All assumptions and calculation logic are documentd within the Creditable platform and available for audit upon request.'
     );
   doc.moveDown();
   doc
@@ -264,6 +264,10 @@ function addFooter(doc: PDFKit.PDFDocument) {
     .text(
       'Final responsibility for creditable coverage determination rests with the plan sponsor. This report does not constitute formal actuarial certification or legal advice. Documentation should be retained for audit purposes.'
     );
+}
+
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLocaleLowerCase();
 }
 
 export default router;
