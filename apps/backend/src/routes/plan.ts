@@ -295,58 +295,6 @@ router.get('/:id/notice', async (req, res) => {
     const updated = 'Updated: April 1, 2011';
     drawFooter(doc, footerText, code, updated);
 
-    // function drawFooter(doc: PDFKit.PDFDocument) {
-    //   const footerText = [
-    //     'According to the Paperwork Reduction Act of 1995, no persons are required to respond to a collection of information unless it displays a valid OMB control number.',
-    //     'The valid OMB control number for this information collection is 0938-0990.',
-    //     'The time required to complete this information collection is estimated to average 8 hours per response initially, including the time to review instructions, search existing data resources, gather the data needed, and complete and review the information collection.',
-    //     'If you have comments concerning the accuracy of the time estimate(s) or suggestions for improving this form, please write to: CMS, 7500 Security Boulevard, Attn: PRA Reports Clearance Officer, Mail Stop C4-26-05, Baltimore, Maryland 21244-1850.',
-    //   ];
-
-    //   const pages = doc.bufferedPageRange();
-
-    //   for (let i = 0; i < pages.count; i++) {
-    //     doc.switchToPage(i); // go to the page
-
-    //     const page = doc.page;
-    //     const width = page.width - page.margins.left - page.margins.right;
-    //     const footerTop = page.height - FOOTER_HEIGHT + 10; // start inside reserved area
-
-    //     doc.save();
-
-    //     // Top line (left/right)
-    //     doc.fontSize(9).font('Helvetica-Bold');
-    //     doc.text('CMS Form 10182-CC', page.margins.left, footerTop, {
-    //       width,
-    //       align: 'left',
-    //       lineBreak: false,
-    //     });
-    //     doc.text('Updated: April 1, 2011', page.margins.left, footerTop, {
-    //       width,
-    //       align: 'right',
-    //       lineBreak: false,
-    //     });
-
-    //     // Multi-line paragraph
-    //     doc.fontSize(8).font('Helvetica');
-    //     let currentY = footerTop + 15;
-    //     footerText.forEach((line) => {
-    //       doc.text(line, page.margins.left, currentY, {
-    //         width,
-    //         align: 'justify',
-    //         lineBreak: false,
-    //       });
-    //       currentY += 10; // fixed line spacing
-    //     });
-
-    //     doc.restore();
-    //   }
-    // }
-
-    // drawFooter(doc);
-
-    // Footer drawing function
-
     doc.end();
   } catch (error) {
     console.error('[GET] /plans/:id/notice', error);
@@ -429,61 +377,6 @@ function addFooter(doc: PDFKit.PDFDocument) {
     .text(
       'Final responsibility for creditable coverage determination rests with the plan sponsor. This report does not constitute formal actuarial certification or legal advice. Documentation should be retained for audit purposes.'
     );
-}
-
-function addNoticeFooterToAllPages(doc: PDFKit.PDFDocument) {
-  const pages = doc.bufferedPageRange();
-  const footerHeight = 90;
-
-  for (let i = 0; i < pages.count; i++) {
-    doc.switchToPage(i);
-
-    const page = doc.page;
-    const width = page.width - page.margins.left - page.margins.right;
-    const footerTop = page.height - page.margins.bottom - footerHeight;
-
-    const leftText = 'CMS Form 10182-CC';
-    const rightText = 'Updated: April 1, 2011';
-
-    doc.fontSize(9).font('Helvetica-Bold');
-    doc.text(leftText, page.margins.left, footerTop, { align: 'left' });
-    doc.text(rightText, page.margins.left, footerTop, {
-      align: 'right',
-      width: width,
-    });
-
-    const footerY = footerTop + 15;
-    const footerText =
-      'According to the Paperwork Reduction Act of 1995, no persons are required to respond to a collection of information unless it displays a valid OMB control number. The valid OMB control number for this information collection is 0938-0990. The time required to complete this information collection is estimated to average 8 hours per response initially, including the time to review instructions, search existing data resources, gather the data needed, and complete and review the information collection. If you have comments concerning the accuracy of the time estimate(s) or suggestions for improving this form, please write to: CMS, 7500 Security Boulevard, Attn: PRA Reports Clearance Officer, Mail Stop C4-26-05, Baltimore, Maryland 21244-1850.';
-
-    doc
-      .fontSize(8)
-      .font('Helvetica')
-      .text(footerText, page.margins.left, footerY, {
-        width,
-        align: 'justify',
-      });
-  }
-}
-
-function addNoticeFooter(doc: PDFKit.PDFDocument) {
-  const bottomMargin = 30;
-  const leftMargin = doc.page.margins.left;
-  const rightMargin = doc.page.margins.right;
-  const pageWidth = doc.page.width - leftMargin - rightMargin;
-  const startY = doc.page.height - bottomMargin - 40;
-
-  doc.save();
-  const text =
-    'According to the Paperwork Reduction Act of 1995, no persons are required to respond to a collection of information unless it displays a valid OMB control number. The valid OMB control number for this information collection is 0938-0990. The time required to complete this information collection is estimated to average 8 hours per response initially, including the time to review instructions, search existing data resources, gather the data needed, and complete and review the information collection. If you have comments concerning the accuracy of the time estimate(s) or suggestions for improving this form, please write to: CMS, 7500 Security Boulevard, Attn: PRA Reports Clearance Officer, Mail Stop C4-26-05, Baltimore, Maryland 21244-1850.';
-  doc
-    .fontSize(9)
-    .text(text, doc.x, startY, {
-      width: pageWidth,
-      align: 'center',
-      ellipsis: false,
-    })
-    .restore();
 }
 
 function generateCreditableNotice(doc: PDFKit.PDFDocument, plan: Plan) {
