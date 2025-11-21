@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Badge, Button, Card, CardContent, FormField, Input } from '../design-system';
-import { ChevronDown, ChevronUp, Download, Eye, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download, Eye, FileText, Trash2 } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
-import { deletePlan, getReport } from '../../api/plans';
+import { deletePlan, getNotice, getReport } from '../../api/plans';
 import { CreditabilityStatus } from '../../types/plan';
 import { Modal } from '../design-system/Modal';
 
@@ -60,6 +60,10 @@ export default function PlanCard({ plan, disabledActions, onDelete }: PlanCardPr
 
   const handleDownload = (action: "view" | "download") => {
     const report = getReport(plan.id, action);
+  }
+
+  const handleViewNotice = (download = false) => {
+    getNotice(plan.id, download);
   }
 
   const handleDelete = async () => {
@@ -137,6 +141,7 @@ export default function PlanCard({ plan, disabledActions, onDelete }: PlanCardPr
               <>
                 <Eye size={20} id="view-anchor" className="cursor-pointer" onClick={() => handleDownload('view')} />
                 <Download size={20} id="download-anchor" className="cursor-pointer" onClick={() => handleDownload('download')} />
+                <FileText size={20} id="view-notice" className="cursor-pointer" onClick={() => handleViewNotice()} />
               </>
             }
             <Tooltip anchorSelect="#delete-anchor" place="bottom">
@@ -147,6 +152,9 @@ export default function PlanCard({ plan, disabledActions, onDelete }: PlanCardPr
             </Tooltip>
             <Tooltip anchorSelect="#download-anchor" place="bottom">
               Download Creditable Report
+            </Tooltip>
+            <Tooltip anchorSelect="view-notice" place="bottom">
+              View Plan Notice
             </Tooltip>
             {expanded ? <ChevronUp size={20} className="cursor-pointer" onClick={() => setExpanded((prev) => !prev)} /> : <ChevronDown size={20} className="cursor-pointer" onClick={() => setExpanded((prev) => !prev)} />}
           </div>

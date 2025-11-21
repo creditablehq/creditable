@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
 import { evaluatePlan } from '../rule-engine';
+import { Prisma } from '@prisma/client';
 
 const router = Router() as Router;
 
@@ -32,22 +33,58 @@ router.get('/', async (req, res) => {
 // POST /companies - create new company
 router.post('/', async (req, res) => {
   const user = req.user;
-  const { name } = req.body;
+  const {
+    name,
+    email,
+    phoneNumber,
+    contactName,
+    streetAddress,
+    city,
+    state,
+    zipCode,
+    country,
+  } = req.body;
+
+  // Fields to validate
+  const requiredFields = [
+    { field: name, fieldName: 'Company name' },
+    { field: email, fieldName: 'Email' },
+    { field: phoneNumber, fieldName: 'Phone number' },
+    { field: contactName, fieldName: 'Contact name' },
+    { field: streetAddress, fieldName: 'Street address' },
+    { field: city, fieldName: 'City' },
+    { field: state, fieldName: 'State' },
+    { field: zipCode, fieldName: 'Zip code' },
+    { field: country, fieldName: 'Country' },
+  ];
 
   if (!user?.brokerId) {
     return res.status(403).json({ message: 'Broker access required' });
   }
 
-  if (!name || name.trim().length === 0) {
-    return res.status(400).json({ message: 'Company name is required' });
+  for (const { field, fieldName } of requiredFields) {
+    if (!field || field.toString().trim().length === 0) {
+      return res.status(400).json({ message: `${fieldName} is required` });
+    }
   }
 
+  const companyData = {
+    name: name.trim(),
+    email: email?.trim() || null,
+    phoneNumber: phoneNumber?.trim() || null,
+    contactName: contactName?.trim() || null,
+    streetAddress: streetAddress?.trim() || null,
+    city: city?.trim() || null,
+    state: state?.trim() || null,
+    zipCode: zipCode?.trim() || null,
+    country: country?.trim() || null,
+    brokerId: user.brokerId || null,
+    userId: user.id,
+  };
+
   const company = await prisma.company.create({
-    data: {
-      name: name.trim(),
-      brokerId: user.brokerId,
-      userId: user.id,
-    },
+    data: companyData,
+    include: { user: true, broker: true },
   });
 
   res.status(201).json(company);
@@ -98,6 +135,33 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error(`[PUT /companies/${id}]`, error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  try {
+    const updatedCompany = await prisma.company.update({
+      where: { id },
+      data,
+      include: {
+        user: true,
+        broker: true,
+      },
+    });
+
+    res.json(updatedCompany);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2025'
+    ) {
+      return res.status(404).json({ error: 'Broker not found' });
+    }
+    console.error('[PATCH /companies/:id]', error);
+    res.status(500).json({ error: 'Failed to update company' });
   }
 });
 

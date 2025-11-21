@@ -117,7 +117,7 @@ const ACTUARIAL_COVERAGE_EXPECTATION = 0.72;
 export function evaluatePlan(
   plan: PlanInput | any,
   method: DeterminationMethod,
-  actuarialAssumptions: ActuarialAssumptions // TODO: type this
+  actuarialAssumptions: ActuarialAssumptions
 ): EvaluationResult {
   const actuarialAssumptionsConfig = {
     ...defaultActuarialConstants.ActuarialAssumptions,

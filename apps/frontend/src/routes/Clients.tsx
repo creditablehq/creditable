@@ -4,15 +4,15 @@ import { CompanyModal } from "../components/Company/CompanyModal";
 import { createCompany } from "../api/companies";
 import { CompaniesTable } from "../components/Company/CompaniesTable";
 import { AuthContext } from "../contexts/AuthContext";
+import { Company } from "../types/Company";
 
 export function Clients() {
   const [isOpen, setIsOpen] = useState(false);
-  const [createdCompany, setCreatedCompany] = useState(null);
+  const [createdCompany, setCreatedCompany] = useState<Company | undefined>(undefined);
 
   const auth = useContext(AuthContext);
   
-
-  const handleCreateCompany = async (data: { name: string }) => {
+  const handleCreateCompany = async (data: Company) => {
     const company = await createCompany(data);
     setCreatedCompany(company);
   };
@@ -26,7 +26,7 @@ export function Clients() {
 
       {
         auth?.token ?
-          <CompaniesTable newCompany={createdCompany} /> :
+          <CompaniesTable newCompany={createdCompany!} /> :
           <div>Loading...</div>
       }
 

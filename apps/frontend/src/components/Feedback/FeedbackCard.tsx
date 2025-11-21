@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Badge, Card, CardContent } from "../design-system";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 type FeedbackCardProps = {
   supportTicket: {
@@ -14,15 +12,6 @@ type FeedbackCardProps = {
 };
 
 export default function FeedbackCard({ supportTicket, onDelete }: FeedbackCardProps) {
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleCloseDeleteModal = () => {
-    setName('');
-    setError('');
-  }
-
   const formatFeedbackType = (type: string) => {
     switch (type) {
       case 'FEATURE_REQUEST':

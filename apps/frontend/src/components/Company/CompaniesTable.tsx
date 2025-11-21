@@ -5,6 +5,7 @@ import { getCompanies } from '../../api/companies';
 import { Table } from '../design-system/Table';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Company } from '../../types/Company';
 
 interface ExtractedClientData extends Record<string, ReactNode> {
   id: string,
@@ -14,7 +15,11 @@ interface ExtractedClientData extends Record<string, ReactNode> {
   'Client Since': string,
 };
 
-export function CompaniesTable({ newCompany }: any) {
+interface CompaniesTableProps {
+  newCompany: Company,
+}
+
+export function CompaniesTable({ newCompany }: CompaniesTableProps) {
   const [companies, setCompanies] = useState<ExtractedClientData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,20 +50,20 @@ export function CompaniesTable({ newCompany }: any) {
   useEffect(() => {
     if (newCompany) {
       setLoading(true);
-      const mappedBrokers = mapClient([...companies, newCompany])
+      const mappedBrokers = companies.concat(mapClient([newCompany]))
       setCompanies(mappedBrokers);
       setLoading(false);
     }
   }, [newCompany])
 
-  const mapClient = (clients: any[]) => {
-    return clients?.map(c => {
+  const mapClient = (clients: Company[]) => {
+    return clients?.map((c: Company) => {
       let extratedClient: ExtractedClientData = {
-        id: c?.id,
+        id: c?.id ?? '',
         Name: c?.name,
         Plans: c?.plans?.length ?? 0,
-        'Created By': c?.user?.name,
-        'Client Since': new Date(c?.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
+        'Created By': c?.user?.name ?? '',
+        'Client Since': new Date(c?.createdAt ?? '').toLocaleDateString('en-US', { month: '2-digit', day: 'numeric', year: 'numeric' }),
       };
       return extratedClient;
     })

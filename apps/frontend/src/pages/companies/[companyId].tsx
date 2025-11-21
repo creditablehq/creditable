@@ -4,18 +4,22 @@ import { useEffect, useState } from 'react';
 import { PlanFormData } from '../../types/plan';
 import { PlanForm } from '../../components/Plans/PlanForm';
 import { getPlansByCompany } from '../../api/plans';
-import { getCompanyById } from '../../api/companies';
+import { getCompanyById, updateCompanyById } from '../../api/companies';
 import { Modal } from '../../components/design-system/Modal';
 import { Button } from '../../components/design-system/Button';
 import PlanCard from '../../components/Company/PlanCard';
 import { getMe } from '../../api/user';
 import { Tooltip } from 'react-tooltip';
+import { NotebookPen } from 'lucide-react';
+import { CompanyModal } from '../../components/Company/CompanyModal';
+import { Company } from '../../types/Company';
 
 export default function CompanyDetail() {
   const { companyId } = useParams();
   const [plans, setPlans] = useState<PlanFormData[]>([]);
-  const [company, setCompany] = useState<any>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [company, setCompany] = useState<Company | undefined>(undefined);
+  const [isAddPlanOpen, setIsAddPlanOpen] = useState(false);
+  const [isEditClientOpen, setIsEditClientOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<any>(null);
   const [disabled, setDisabled] = useState(false);
@@ -41,15 +45,32 @@ export default function CompanyDetail() {
     setPlans(prevPlans => prevPlans?.filter(plan => plan?.id !== id) || null);
   }
 
+  const handleUpdateCompany = async (data: Company) => {
+    if (companyId) {
+      const company = await updateCompanyById(companyId, data);
+      setCompany(company);
+    }
+    setIsEditClientOpen(false);
+  }
+
   if (loading) return <p>Loading company info...</p>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Plans for <span className="text-neutral-700 font-light italic">{company?.name}</span></h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Plans for <span className="text-neutral-700 font-light italic">{company?.name}</span></h1>
+          <div
+            className="cursor-pointer hover:text-brand"
+            onClick={() => setIsEditClientOpen(true)}
+          >
+            <NotebookPen id="edit-client-info" strokeWidth={1.75} size={20} />
+            <Tooltip anchorSelect="#edit-client-info" place="right">Edit Client Info</Tooltip>
+          </div>
+        </div>
         <Button
           id="add-plan-btn"
-          onClick={() => setIsOpen(true)}
+          onClick={() => setIsAddPlanOpen(true)}
           variant={disabled ? 'disabled' : 'default'}
         >
           + Add Plan
@@ -69,16 +90,23 @@ export default function CompanyDetail() {
         return (<PlanCard key={plan?.id} plan={plan} disabledActions={me.broker?.isPaywalled || false} onDelete={updatePlans} />);
       })}
 
-      <Modal open={isOpen} onClose={() => setIsOpen(false)} title="Create Plan">
+      <Modal open={isAddPlanOpen} onClose={() => setIsAddPlanOpen(false)} title="Create Plan">
         <PlanForm
           companyId={companyId!}
           onPlanCreated={() => {
             getPlansByCompany(companyId!).then(setPlans);
             getMe().then(setMe);
-            setIsOpen(false);
+            setIsAddPlanOpen(false);
           }}
         />
       </Modal>
+
+      <CompanyModal
+        open={isEditClientOpen}
+        initialData={company}
+        onClose={() => setIsEditClientOpen(false)}
+        onSubmit={handleUpdateCompany} 
+      />
     </div>
   );
 }

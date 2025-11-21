@@ -90,3 +90,35 @@ export async function getReport(id: string, action: 'view' | 'download') {
     window.open(url, '_blank');
   }
 }
+
+export async function getNotice(id: string, download: boolean) {
+  const token = getAuthToken();
+  const res = await fetch(`${API_BASE_URL}/plans/${id}/notice`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(
+      'Failed to fetch notice: ' + error.message || 'Failed to fetch notice'
+    );
+  }
+
+  if (download) {
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plan-notice-${id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } else {
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  }
+}
