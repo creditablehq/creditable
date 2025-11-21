@@ -6,7 +6,9 @@ import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth m
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
-import { Plan } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+type PlanWithCompany = Prisma.PlanGetPayload<{ include: { company: true } }>;
 
 const router = Router() as Router;
 
@@ -379,7 +381,10 @@ function addFooter(doc: PDFKit.PDFDocument) {
     );
 }
 
-function generateCreditableNotice(doc: PDFKit.PDFDocument, plan: Plan) {
+function generateCreditableNotice(
+  doc: PDFKit.PDFDocument,
+  plan: PlanWithCompany
+) {
   const logoBuffer = fs.readFileSync(
     path.join(
       __dirname,
@@ -797,7 +802,10 @@ function generateCreditableNotice(doc: PDFKit.PDFDocument, plan: Plan) {
     );
 }
 
-function generateNonCreditableNotice(doc: PDFKit.PDFDocument, plan: Plan) {
+function generateNonCreditableNotice(
+  doc: PDFKit.PDFDocument,
+  plan: PlanWithCompany
+) {
   const logoBuffer = fs.readFileSync(
     path.join(
       __dirname,
