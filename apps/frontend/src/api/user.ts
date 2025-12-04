@@ -38,3 +38,28 @@ export async function createUser(data: UserFormData) {
 
   return res.json();
 }
+
+export async function updateUser(id: string, data: any) {
+  const token = getAuthToken();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/users/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'Failed to update user');
+    }
+
+    return res.json();
+  } catch (e: any) {
+    console.error('Error updating user: ', e);
+    throw e;
+  }
+}

@@ -14,18 +14,19 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  name           String
-  password       String
-  role           Role            @default(BROKER)
-  brokerId       String
-  broker         Broker          @relation(fields: [brokerId], references: [id])
-  companies      Company[]
-  plans          Plan[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  SupportTickets SupportTicket[]
+  id                        String          @id @default(cuid())
+  email                     String          @unique
+  name                      String
+  password                  String
+  role                      Role            @default(BROKER)
+  brokerId                  String
+  broker                    Broker          @relation(fields: [brokerId], references: [id])
+  companies                 Company[]
+  plans                     Plan[]
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+  SupportTickets            SupportTicket[]
+  hasConsentedUserAgreement Boolean         @default(false)
 }
 
 model Broker {

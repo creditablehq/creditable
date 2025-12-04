@@ -8,6 +8,7 @@ interface JwtPayload {
   email: string;
   brokerId?: string;
   role: 'BROKER' | 'ADMIN';
+  hasConsentedUserAgreement: boolean;
 }
 
 // Extend Express.Request to include `user`

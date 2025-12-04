@@ -12,12 +12,18 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   className?: string;
+  closeable?: boolean;
 }
 
-export function Modal({ open, onClose, title, children, footer, className }: ModalProps) {
+export function Modal({ open, onClose, title, children, footer, className, closeable = true }: ModalProps) {
   return (
     <Transition show={open} as={Fragment}>
-      <Dialog onClose={onClose} className="relative z-50">
+      <Dialog
+        onClose={() => {
+          if (closeable) onClose() 
+        }}
+        className="relative z-50"
+      >
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-200"
@@ -53,12 +59,12 @@ export function Modal({ open, onClose, title, children, footer, className }: Mod
                       {title}
                     </DialogTitle>
                   )}
-                  <button
+                  {closeable && <button
                     onClick={onClose}
                     className="text-neutral-500 transition hover:text-neutral-700 dark:hover:text-neutral-300 cursor-pointer"
                   >
                     <X className="h-5 w-5" />
-                  </button>
+                  </button>}
                 </div>
 
                 <div className="mt-4 text-sm text-neutral-700 dark:text-neutral-200">

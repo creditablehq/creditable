@@ -50,6 +50,7 @@ router.post('/login', async (req: Request, res: Response) => {
       email: user.email,
       brokerId: user.brokerId,
       role: user.role,
+      hasConsentedUserAgreement: user.hasConsentedUserAgreement,
     });
     res.json({ token, user });
   } catch (error) {

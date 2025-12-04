@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
@@ -12,30 +12,46 @@ import { Brokers } from './routes/Brokers';
 import CompanyDetail from './pages/companies/[companyId]';
 import { Settings } from './routes/Settings';
 import ProtectedRoute from './routes/ProtectedRoute';
-import { useAuth, AuthProvider } from './contexts/AuthContext';
+import { useAuth, AuthProvider, AuthContext } from './contexts/AuthContext';
 import { Feedback } from './routes/Feedback';
 import BrokerDetail from './pages/brokers/[brokerId]';
+import { UserAgreementModal } from './components/auth/UserAgreementModal';
+import { updateUser } from './api/user';
 
 const AppContent = () => {
   const { token } = useAuth();
-  const [showAuthForm, setShowAuthForm ] = useState<boolean>(false);
-  const [authMode, setAuthMode] = useState<'signup' | 'login'>('login');
-  const [ping, setPing] = useState<string | null>(null);
+  const [ showAuthForm, setShowAuthForm ] = useState(false);
+  const [ showUserAgreement, setShowUserAgreement ] = useState(true);
+  const [ authMode, setAuthMode ] = useState<'signup' | 'login'>('login');
+  const [ ping, setPing ] = useState<string | null>(null);
+
+  const auth = useContext(AuthContext);
+  const { setToken, setUser } = useAuth();
 
   useEffect(() => {
     if (!token) {
       setShowAuthForm(true);
     } else {
       setShowAuthForm(false);
+      setShowUserAgreement(!auth?.user?.hasConsentedUserAgreement);
     }
     pingBackend()
       .then((data) => setPing(data.message))
       .catch((err) => setPing('❌ Error: ' + err.message));
   }, [token]);
 
+  const handleCloseUserAgreement = () => {
+    updateUser(auth?.user?.id, { hasConsentedUserAgreement: true })
+      .then((res) => {
+        setToken(res?.token);
+        setUser(res?.updatedUser);
+        setShowUserAgreement(false) 
+      })
+      .catch(e => { console.error("Error accpeting user agreement", e)});
+  }
+
   return (
     <div className="min-h-screen bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
-      {/* If the user is not logged in, show the auth form */}
       {showAuthForm ? (
         <ModalAuthWrapper
           title={authMode === 'signup' ? 'Sign Up' : 'Log In'}
@@ -44,8 +60,9 @@ const AppContent = () => {
         >
           {authMode === 'signup' ? <SignupForm /> : <LoginForm />}
         </ModalAuthWrapper>
+      ) : showUserAgreement ? (
+        <UserAgreementModal onClose={handleCloseUserAgreement} />
       ) : (
-        // If the user is logged in, show the main app content
         <Router>
           <Layout>
             <Routes>

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware } from '../middleware/auth'; // assumes JWT-based auth middleware
-import { hashPassword } from '../services/auth';
+import { createJWT, hashPassword } from '../services/auth';
 
 const router = Router() as Router;
 
@@ -95,4 +95,37 @@ router.post('/', async (req, res) => {
       .json({ message: 'Internal server error: Failed to post /users' });
   }
 });
+
+router.put('/:id', async (req, res) => {
+  const data = req.body;
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { broker: true },
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found.' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: data,
+    });
+
+    const token = createJWT({
+      id: updatedUser.id,
+      email: updatedUser.email,
+      brokerId: updatedUser.brokerId,
+      role: updatedUser.role,
+    });
+    res.json({ token, updatedUser });
+  } catch (error) {
+    console.error('[login error]', error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+});
+
 export default router;
