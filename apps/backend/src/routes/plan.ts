@@ -385,22 +385,6 @@ function generateCreditableNotice(
   doc: PDFKit.PDFDocument,
   plan: PlanWithCompany
 ) {
-  const logoBuffer = fs.readFileSync(
-    path.join(
-      __dirname,
-      '..',
-      '..',
-      'public',
-      'images',
-      'creditable_transparent.png'
-    )
-  );
-
-  ensureSpace(doc, 100);
-  doc.image(logoBuffer, 40, 10, { width: 100 });
-  doc.moveDown(3);
-
-  ensureSpace(doc, 60);
   doc
     .fontSize(20)
     .font('Helvetica-Bold')
@@ -806,22 +790,6 @@ function generateNonCreditableNotice(
   doc: PDFKit.PDFDocument,
   plan: PlanWithCompany
 ) {
-  const logoBuffer = fs.readFileSync(
-    path.join(
-      __dirname,
-      '..',
-      '..',
-      'public',
-      'images',
-      'creditable_transparent.png'
-    )
-  );
-
-  ensureSpace(doc, 100);
-  doc.image(logoBuffer, 40, 10, { width: 100 });
-  doc.moveDown(3);
-
-  ensureSpace(doc, 60);
   doc
     .fontSize(20)
     .font('Helvetica-Bold')
