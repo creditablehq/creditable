@@ -11,8 +11,6 @@ const INITIAL_ASSUMPTIONS_VALUES = {
   t2FillCost: 100,
   t3FillCost: 250,
   t4FillCost: 5000,
-  annualFillsPerTier: 12,
-  defaultBrandFillCounter: 10,
   estimatedAnnualFills: 42,
   rxDeductibleAllocation: 0.2,
 }
@@ -34,8 +32,6 @@ export interface ActuarialAssumptionsInput {
   t2FillCost: number;
   t3FillCost: number;
   t4FillCost: number;
-  annualFillsPerTier: number;
-  defaultBrandFillCounter: number;
   estimatedAnnualFills: number;
   rxDeductibleAllocation: number;
 }
@@ -50,8 +46,6 @@ export function ActuarialAssumptionsModal({open, onClose, planName, onSetForPlan
     t2FillCost: initialData?.t2FillCost ?? INITIAL_ASSUMPTIONS_VALUES.t2FillCost,
     t3FillCost: initialData?.t3FillCost ?? INITIAL_ASSUMPTIONS_VALUES.t3FillCost,
     t4FillCost: initialData?.t4FillCost ?? INITIAL_ASSUMPTIONS_VALUES.t4FillCost,
-    annualFillsPerTier: initialData?.annualFillsPerTier ?? INITIAL_ASSUMPTIONS_VALUES.annualFillsPerTier,
-    defaultBrandFillCounter: initialData?.defaultBrandFillCounter ?? INITIAL_ASSUMPTIONS_VALUES.defaultBrandFillCounter,
     estimatedAnnualFills: initialData?.estimatedAnnualFills ?? INITIAL_ASSUMPTIONS_VALUES.estimatedAnnualFills,
     rxDeductibleAllocation: initialData?.rxDeductibleAllocation ?? INITIAL_ASSUMPTIONS_VALUES.rxDeductibleAllocation,
   });

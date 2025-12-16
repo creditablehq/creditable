@@ -49,12 +49,8 @@ export interface ActuarialAssumptions {
   t2FillCost: number;
   t3FillCost: number;
   t4FillCost: number;
-  annualFillsPerTier: number;
-  exposureScalingFactor: number;
-  defaultBrandFillCounter: number;
   estimatedAnnualFills: number;
   rxDeductibleAllocation: number;
-  t4ExpectedFillScaler: number;
 }
 
 export interface ActuarialConstants {
@@ -74,12 +70,8 @@ export interface ActuarialConstants {
     t2FillCost: number;
     t3FillCost: number;
     t4FillCost: number;
-    annualFillsPerTier: number;
-    exposureScalingFactor: number;
-    defaultBrandFillCounter: number;
     estimatedAnnualFills: number;
     rxDeductibleAllocation: number;
-    t4ExpectedFillScaler: number;
   };
 }
 
@@ -92,54 +84,44 @@ const defaultActuarialConstants: ActuarialConstants = {
     targetGrossCost: 5500,
   },
   ActuarialAssumptions: {
-    t1Utilization: 0.65,
-    t2Utilization: 0.25,
-    t3Utilization: 0.07,
-    t4Utilization: 0.03,
-    t1FillCost: 20,
-    t2FillCost: 100,
-    t3FillCost: 250,
-    t4FillCost: 5000,
-    annualFillsPerTier: 12,
-    exposureScalingFactor: 3.5,
-    defaultBrandFillCounter: 10,
-    estimatedAnnualFills: 42,
+    t1Utilization: 0.722,
+    t2Utilization: 0.227,
+    t3Utilization: 0.036,
+    t4Utilization: 0.016,
+    t1FillCost: 27,
+    t2FillCost: 130,
+    t3FillCost: 325,
+    t4FillCost: 6000,
+    estimatedAnnualFills: 45,
     rxDeductibleAllocation: 0.2,
-    t4ExpectedFillScaler: 0.5,
   } as ActuarialAssumptions,
 };
 
 const ACTUARIAL_COVERAGE_EXPECTATION = 0.72;
 
-/**
- * Simplified rule evaluation for Medicare Part D creditability.
- */
 export function evaluatePlan(
-  plan: PlanInput | any,
+  plan: PlanInput,
   method: DeterminationMethod,
   actuarialAssumptions: ActuarialAssumptions
 ): EvaluationResult {
-  const actuarialAssumptionsConfig = {
+  const mergedAssumptions = {
     ...defaultActuarialConstants.ActuarialAssumptions,
     ...actuarialAssumptions,
   };
-
-  console.log(
-    'EVALUATING PLAN WITH PASSED ASSUMPTIONS: ',
-    actuarialAssumptionsConfig
-  );
-
+  console.log('HERE', mergedAssumptions, method);
   if (method === 'SIMPLIFIED') {
-    return evaluateSimplified(plan, actuarialAssumptionsConfig);
-  } else if (method === 'ACTUARIAL') {
-    return evaluateActuarial(plan, actuarialAssumptionsConfig);
+    return evaluateSimplified(plan, mergedAssumptions);
+  }
+
+  if (method === 'ACTUARIAL') {
+    return evaluateActuarial(plan, mergedAssumptions);
   }
 
   return {
     method,
     result: 'UNKNOWN',
     actuarialPercentage: 0,
-    actuarialAssumptions: {} as ActuarialAssumptions,
+    actuarialAssumptions: mergedAssumptions,
     isCreditable: false,
     reasoning: 'Unsupported evaluation method',
   };
@@ -147,34 +129,27 @@ export function evaluatePlan(
 
 function evaluateActuarial(
   plan: PlanInput,
-  actuarialAssumptions: ActuarialAssumptions
+  assumptions: ActuarialAssumptions
 ): EvaluationResult {
-  // 🧠 Example rules — replace these with real rules as needed
-  const grossCost = calculateGrossCost(actuarialAssumptions);
-  const planPays = calculatePlanPays(grossCost, plan, actuarialAssumptions);
-  // console.log(grossCost, planPays);
+  const grossCost = calculateGrossCost(assumptions);
+  const planPays = calculatePlanPays(grossCost, plan, assumptions);
   const actuarialPercentage = planPays / grossCost;
 
-  if (actuarialPercentage >= ACTUARIAL_COVERAGE_EXPECTATION) {
-    return {
-      method: 'ACTUARIAL',
-      result: 'CREDITABLE',
-      actuarialPercentage: actuarialPercentage,
-      actuarialAssumptions: actuarialAssumptions,
-      isCreditable: true,
-      reasoning:
-        'Plan meets simplified thresholds for coverering at least 72% of prescription drug costs.',
-    };
-  }
+  const isCreditable = actuarialPercentage >= ACTUARIAL_COVERAGE_EXPECTATION;
+
+  console.log(
+    `Calculated AV %: ${actuarialPercentage}\nPlan Pays: ${planPays}\nGross Cost: ${grossCost}`
+  );
 
   return {
     method: 'ACTUARIAL',
-    result: 'NON_CREDITABLE',
-    actuarialPercentage: actuarialPercentage,
-    actuarialAssumptions: actuarialAssumptions,
-    isCreditable: false,
-    reasoning:
-      'Plan exceeds simplified thresholds or is missing required values.',
+    result: isCreditable ? 'CREDITABLE' : 'NON_CREDITABLE',
+    actuarialPercentage,
+    actuarialAssumptions: assumptions,
+    isCreditable,
+    reasoning: isCreditable
+      ? 'Plan meets actuarial requirements (≥72%).'
+      : 'Plan fails actuarial requirement (<72%).',
   };
 }
 
@@ -182,7 +157,6 @@ function evaluateSimplified(
   plan: PlanInput,
   actuarialAssumptions: ActuarialAssumptions
 ): EvaluationResult {
-  // Placeholder logic:
   const averageTierShare =
     (plan.t1ShareValue +
       plan.t2ShareValue +
@@ -213,171 +187,191 @@ function evaluateSimplified(
   };
 }
 
-function calculateGrossCost(
-  actuarialAssumptions: ActuarialAssumptions
-): number {
-  const {
-    t1FillCost,
-    t2FillCost,
-    t3FillCost,
-    t4FillCost,
-    t1Utilization,
-    t2Utilization,
-    t3Utilization,
-    t4Utilization,
-    estimatedAnnualFills,
-  } = actuarialAssumptions;
+function calculateGrossCost(a: ActuarialAssumptions): number {
+  const t4Util = a.t4Utilization;
+  const t1Cost = a.t1Utilization * a.t1FillCost;
+  const t2Cost = a.t2Utilization * a.t2FillCost;
+  const t3Cost = a.t3Utilization * a.t3FillCost;
+  const t4Cost = a.t4Utilization * a.t4FillCost;
+
+  console.log(`T1-4 Cost: ${t1Cost} | ${t2Cost} | ${t3Cost} | ${t4Cost}`);
+
   return (
-    estimatedAnnualFills *
+    a.estimatedAnnualFills *
     [
-      t1Utilization * t1FillCost,
-      t2Utilization * t2FillCost,
-      t3Utilization * t3FillCost,
-      t4Utilization * t4FillCost * actuarialAssumptions.t4ExpectedFillScaler,
-    ].reduce((acc, curr) => acc + curr, 0)
+      a.t1Utilization * a.t1FillCost,
+      a.t2Utilization * a.t2FillCost,
+      a.t3Utilization * a.t3FillCost,
+      t4Util * a.t4FillCost,
+    ].reduce((s, x) => s + x, 0)
   );
 }
 
 function calculatePlanPays(
   grossCost: number,
   plan: PlanInput,
-  actuarialAssumptions: ActuarialAssumptions
+  assumptions: ActuarialAssumptions
 ): number {
-  let tnMemberTotalCost = calculateTnMemberTotalCost(
+  const memberCosts = calculateTierMemberCosts(plan, assumptions);
+  const memberTotal = memberCosts.reduce((sum, x) => sum + x, 0);
+  console.log(`Tier Member Cost: ${memberCosts}\nMember Total ${memberTotal}`);
+  return grossCost - memberTotal;
+}
+
+function calculateTierMemberCosts(
+  plan: PlanInput,
+  a: ActuarialAssumptions
+): number[] {
+  const fills = [
+    a.t1Utilization * a.estimatedAnnualFills,
+    a.t2Utilization * a.estimatedAnnualFills,
+    a.t3Utilization * a.estimatedAnnualFills,
+    a.t4Utilization * a.estimatedAnnualFills,
+  ];
+
+  const costs = [a.t1FillCost, a.t2FillCost, a.t3FillCost, a.t4FillCost];
+
+  const gross = fills.map((f, i) => f * costs[i]);
+
+  let remainingDed = plan.integratedDeductible
+    ? plan.deductible * a.rxDeductibleAllocation
+    : plan.deductible;
+
+  remainingDed = propagateDeductibleThroughTiers(
     plan,
-    actuarialAssumptions
+    fills,
+    gross,
+    remainingDed
   );
 
-  const totalMemberPays = tnMemberTotalCost.reduce(
-    (arr, curr) => arr + curr,
+  console.log(`Remaining Ded: ${remainingDed}`);
+
+  const t4MemberPays = calculateTier4MemberCost(
+    plan,
+    fills[3],
+    costs[3],
+    gross[3],
+    remainingDed
+  );
+
+  const t1 = calculateTierMemberCost(
+    plan,
+    fills[0],
+    gross[0],
+    plan.t1UsesDeductible,
     0
   );
-  // console.log('======== MEMBER COST ==========', totalMemberPays);
+  const t2 = calculateTierMemberCost(
+    plan,
+    fills[1],
+    gross[1],
+    plan.t2UsesDeductible,
+    1
+  );
+  const t3 = calculateTierMemberCost(
+    plan,
+    fills[2],
+    gross[2],
+    plan.t3UsesDeductible,
+    2
+  );
 
-  // console.log('plan pays: ', grossCost, tnMemberTotalCost, totalMemberPays);
+  console.log(
+    `T1 Member Cost: ${t1}\nT2 Member Pays: ${t2}\nT3 Member Pays: ${t3}\nT4 Member Pays: ${t4MemberPays}`
+  );
 
-  return grossCost - totalMemberPays;
+  return [t1, t2, t3, t4MemberPays];
 }
 
-/**
- * AV% = Plan Pays /  Gross Cost
- */
-function calculateTnMemberTotalCost(
+function propagateDeductibleThroughTiers(
   plan: PlanInput,
-  actuarialAssumptions: ActuarialAssumptions
-): number[] {
-  let effectiveDeductible = plan.integratedDeductible
-    ? plan.deductible * actuarialAssumptions.rxDeductibleAllocation
-    : plan.deductible;
-  const estimatedAnnualFills = actuarialAssumptions.estimatedAnnualFills;
-  const tnFillTotal = [
-    actuarialAssumptions.t1Utilization * estimatedAnnualFills,
-    actuarialAssumptions.t2Utilization * estimatedAnnualFills,
-    actuarialAssumptions.t3Utilization * estimatedAnnualFills,
-    actuarialAssumptions.t4Utilization *
-      estimatedAnnualFills *
-      actuarialAssumptions.t4ExpectedFillScaler,
-  ];
-  const fillCost = [
-    actuarialAssumptions.t1FillCost,
-    actuarialAssumptions.t2FillCost,
-    actuarialAssumptions.t3FillCost,
-    actuarialAssumptions.t4FillCost,
-  ];
+  fills: number[],
+  gross: number[],
+  ded: number
+): number {
+  if (plan.t1UsesDeductible) {
+    const t1Consumed = Math.min(gross[0], ded);
+    ded -= t1Consumed;
+  }
 
-  let tnMemberTotalCost = Array.from({ length: 4 }) as number[];
-  let memberTierRunningTotal = 0;
+  if (plan.t2UsesDeductible) {
+    const t2Consumed = Math.min(gross[1], ded);
+    ded -= t2Consumed;
+  }
 
-  tnMemberTotalCost.forEach((cost, i) => {
-    const n = i + 1;
-    const tnUsesDeductibleKey = `t${n}UsesDeductible` as keyof PlanInput;
-    const tnUsesDeductible = plan[tnUsesDeductibleKey] as boolean;
+  if (plan.t3UsesDeductible) {
+    const t3Consumed = Math.min(gross[2], ded);
+    ded -= t3Consumed;
+  }
 
-    const tnGross = tnFillTotal[i] * fillCost[i];
-    memberTierRunningTotal += tnGross;
-
-    const tnShareType = `t${n}CostSharingType` as keyof PlanInput;
-    const tnShareValueKey = `t${n}ShareValue` as keyof PlanInput;
-    const tnShareValue = plan[tnShareValueKey] as number;
-
-    if (plan[tnShareType] === 'COPAY') {
-      const { member, dedApplied, rdExiting } = tierMemeberPaysCopay(
-        tnFillTotal[i],
-        tnShareValue,
-        tnUsesDeductible,
-        tnGross,
-        effectiveDeductible
-      );
-      cost = member;
-      effectiveDeductible = rdExiting;
-    } else {
-      const coinsurancePct = tnShareValue;
-      let dedApplied = 0;
-
-      const tnCapValueKey = `t${n}CapValue` as keyof PlanInput;
-      const tnCapValue = plan[tnCapValueKey] as number;
-
-      if (!tnUsesDeductible) {
-        const residual = tnGross;
-        const coinsuranceUncapped = residual * coinsurancePct;
-        const coinsuranceCapped = Math.min(
-          coinsuranceUncapped,
-          capLimit(tnFillTotal[i], tnCapValue)
-        );
-        cost = coinsuranceCapped;
-      } else {
-        dedApplied = Math.min(tnGross, effectiveDeductible);
-        const residual = tnGross - dedApplied;
-
-        if (dedApplied === tnGross) {
-          cost = tnGross;
-          effectiveDeductible -= dedApplied;
-        } else {
-          const coinsuranceUncapped = residual * coinsurancePct;
-          const coinsuranceCapped = Math.min(
-            coinsuranceUncapped,
-            capLimit(tnFillTotal[i], tnCapValue)
-          );
-
-          cost = dedApplied + coinsuranceCapped;
-          effectiveDeductible -= dedApplied;
-        }
-      }
-    }
-    tnMemberTotalCost[i] = cost;
-  });
-
-  return tnMemberTotalCost;
+  return ded;
 }
 
-function tierMemeberPaysCopay(
+function calculateTierMemberCost(
+  plan: PlanInput,
   fills: number,
-  copayPerFill: number,
-  usesDeductible: boolean,
   gross: number,
-  rdEntering: number
-): { member: number; dedApplied: number; rdExiting: number } {
-  if (!usesDeductible) {
-    return {
-      member: fills * copayPerFill,
-      dedApplied: 0,
-      rdExiting: rdEntering,
-    };
-  }
-  const dedApplied = Math.min(gross, rdEntering);
-  const residual = gross - dedApplied;
-  if (dedApplied === gross) {
-    // Still fully deductible
-    return { member: gross, dedApplied, rdExiting: rdEntering - dedApplied };
+  usesDed: boolean,
+  tierIndex: number
+): number {
+  const tier = tierIndex + 1;
+
+  const tnCostShareTypeKey = `t${tier}CostSharingType` as keyof PlanInput;
+  const tnShareValueKey = `t${tier}ShareValue` as keyof PlanInput;
+
+  const shareType = plan[tnCostShareTypeKey] as 'COPAY' | 'COINSURANCE';
+  const shareValue = plan[tnShareValueKey] as number;
+
+  if (usesDed) {
+    return Math.min(gross, plan.deductible);
   }
 
-  const member = dedApplied + fills * copayPerFill;
-  return { member, dedApplied, rdExiting: rdEntering - dedApplied };
+  if (shareType === 'COPAY') {
+    return fills * shareValue;
+  }
+
+  return gross * shareValue;
 }
 
-function capLimit(fills: number, capValue: number): number {
-  if (capValue === null || capValue <= 0) {
-    return Infinity;
+function calculateTier4MemberCost(
+  plan: PlanInput,
+  fills: number,
+  costPerFill: number,
+  gross: number,
+  remainingDed: number
+): number {
+  const usesDed = plan.t4UsesDeductible;
+  const costType = plan.t4CostSharingType.toLowerCase();
+  const costValue = plan.t4ShareValue;
+  const capValue = plan.t4CapValue ?? 0;
+
+  if (!usesDed) {
+    if (costType === 'copay') {
+      return fills * costValue;
+    }
+
+    const coinsUncapped = gross * costValue;
+    const capLimit = capValue > 0 ? fills * capValue : Infinity;
+    return Math.min(coinsUncapped, capLimit);
   }
-  return fills * capValue;
+
+  if (remainingDed >= gross) {
+    return gross;
+  }
+
+  const dedApplied = Math.min(remainingDed, gross);
+  const residual = gross - dedApplied;
+
+  if (costType === 'copay') {
+    const fillsAbsorbed = dedApplied / costPerFill;
+    const remainingFills = fills - fillsAbsorbed;
+    const copayAmount = remainingFills * costValue;
+    return dedApplied + copayAmount;
+  }
+
+  const coinsUncapped = residual * costValue;
+  const capLimit = capValue > 0 ? fills * capValue : Infinity;
+  const coinsCapped = Math.min(coinsUncapped, capLimit);
+
+  return dedApplied + coinsCapped;
 }
