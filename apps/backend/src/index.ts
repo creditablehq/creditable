@@ -8,6 +8,7 @@ import brokerRouter from './routes/brokers';
 import userRouter from './routes/user';
 import supportTicketRouter from './routes/supportTickets';
 import path from 'path';
+import driveRouter from './routes/drive';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/plans', planRouter);
 app.use('/api/brokers', brokerRouter);
 app.use('/api/users', userRouter);
 app.use('/api/supportTickets', supportTicketRouter);
+app.use('/api/drive', driveRouter);
 
 app.get('/', (_req, res) => {
   res.send('Creditable API is live!');

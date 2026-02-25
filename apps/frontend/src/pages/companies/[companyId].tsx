@@ -10,9 +10,16 @@ import { Button } from '../../components/design-system/Button';
 import PlanCard from '../../components/Company/PlanCard';
 import { getMe } from '../../api/user';
 import { Tooltip } from 'react-tooltip';
-import { NotebookPen } from 'lucide-react';
+import { FileCheck, NotebookPen, Upload } from 'lucide-react';
 import { CompanyModal } from '../../components/Company/CompanyModal';
 import { Company } from '../../types/Company';
+import { UploadModal } from '../../components/layout/UploadModal';
+import emailjs from '@emailjs/browser';
+
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? '';
+const EMAILJS_UPLOAD_COMPLETE_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_UPLOAD_COMPLETE_TEMPLATE ?? '';
+const EMIALJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? '';
+
 
 export default function CompanyDetail() {
   const { companyId } = useParams();
@@ -20,6 +27,8 @@ export default function CompanyDetail() {
   const [company, setCompany] = useState<Company | undefined>(undefined);
   const [isAddPlanOpen, setIsAddPlanOpen] = useState(false);
   const [isEditClientOpen, setIsEditClientOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isFileSubmissionSuccessful, setIsFileSubmissionSuccessful] = useState(false);
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<any>(null);
   const [disabled, setDisabled] = useState(false);
@@ -53,6 +62,29 @@ export default function CompanyDetail() {
     setIsEditClientOpen(false);
   }
 
+  const sendUploadEmail = () => {
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_UPLOAD_COMPLETE_TEMPLATE_ID || !EMIALJS_PUBLIC_KEY) {
+      console.error('Error sending automated emails: Invalid Public Key, Service ID, or Template ID.');
+      return;
+    }
+
+    emailjs
+      .send(EMAILJS_SERVICE_ID, EMAILJS_UPLOAD_COMPLETE_TEMPLATE_ID, {
+        account: me?.name,
+        broker: me?.broker?.name,
+        company: company?.name,
+      }, EMIALJS_PUBLIC_KEY)
+      .catch((err) => {
+        console.error('Failed to send file upload email!', err);
+      });
+  }
+
+  const handleUpload = async () => {
+    setIsFileSubmissionSuccessful(true);
+    setIsUploadModalOpen(false);
+    sendUploadEmail();
+  }
+
   if (loading) return <p>Loading company info...</p>;
 
   return (
@@ -68,18 +100,29 @@ export default function CompanyDetail() {
             <Tooltip anchorSelect="#edit-client-info" place="right">Edit Client Info</Tooltip>
           </div>
         </div>
-        <Button
-          id="add-plan-btn"
-          onClick={() => setIsAddPlanOpen(true)}
-          variant={disabled ? 'disabled' : 'default'}
-        >
-          + Add Plan
-        </Button>
-        { disabled &&
-          <Tooltip anchorSelect="#add-plan-btn" place="bottom">
-            Plan limit reached. Contact to increase plan maximum.
-          </Tooltip>
-        }
+        <div className="flex items-center gap-4">
+          <Button
+            id="add-plan-btn"
+            onClick={() => setIsUploadModalOpen(true)}
+            variant={disabled ? 'disabled' : 'default'}
+            className="flex gap-2"
+          >
+            <Upload size={20} strokeWidth={1.5} className="cursor-pointer" onClick={() => setIsUploadModalOpen(true)} />
+            Upload Plan Documents
+          </Button>
+          <Button
+            id="add-plan-btn"
+            onClick={() => setIsAddPlanOpen(true)}
+            variant={disabled ? 'disabled' : 'default'}
+          >
+            + Add Plan
+          </Button>
+          { disabled &&
+            <Tooltip anchorSelect="#add-plan-btn" place="bottom">
+              Plan limit reached. Contact to increase plan maximum.
+            </Tooltip>
+          }
+        </div>
       </div>
 
       {!plans.length && 
@@ -107,6 +150,19 @@ export default function CompanyDetail() {
         onClose={() => setIsEditClientOpen(false)}
         onSubmit={handleUpdateCompany} 
       />
+
+      <UploadModal
+        open={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSubmit={handleUpload}
+      />
+
+      <Modal open={isFileSubmissionSuccessful} onClose={() => setIsFileSubmissionSuccessful(false)} title="File Submission Successful!">
+        <div className="flex items-center gap-4 px-4">
+          <FileCheck size={"64px"} className="text-blue-500" />
+          The Creditable team has be notified of your plan upload and will be processed shortly. Thank you!
+        </div>
+      </Modal>
     </div>
   );
 }
