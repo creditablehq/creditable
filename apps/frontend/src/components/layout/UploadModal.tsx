@@ -17,6 +17,7 @@ export interface UploadFormInput {
 export function UploadModal({open, onClose, onSubmit}: UploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleUpload = async () => {
     if (!file) return;
@@ -27,8 +28,10 @@ export function UploadModal({open, onClose, onSubmit}: UploadModalProps) {
       handleReset();
       onSubmit();
     } else {
-      setError('File upload failed. Please try again.')
+      setError('File upload failed. Please try again.');
     }
+
+    setIsUploading(false);
   };
 
   const handleFileChange = (
@@ -46,6 +49,7 @@ export function UploadModal({open, onClose, onSubmit}: UploadModalProps) {
   }
 
   const onFileSubmission = async () => {
+    setIsUploading(true);
     handleUpload();
   }
 
@@ -79,7 +83,7 @@ export function UploadModal({open, onClose, onSubmit}: UploadModalProps) {
         {error && <span className="text-red-600 text-sm">{error}</span>}
       </div>
       <div className="flex justify-evenly items-center gap-4 mt-6">
-        <Button className="w-full" onClick={handleReset} variant="outline">
+        <Button className="w-full" onClick={handleReset} variant={isUploading ? 'disabled' : 'outline'}>
           {file ? 'Reset' : 'Cancel'}
         </Button>
         <Button className="w-full" onClick={onFileSubmission} variant={file ? 'default' : 'disabled'}>
