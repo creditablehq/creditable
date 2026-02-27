@@ -86,7 +86,7 @@ export function UploadModal({open, onClose, onSubmit}: UploadModalProps) {
         <Button className="w-full" onClick={handleReset} variant={isUploading ? 'disabled' : 'outline'}>
           {file ? 'Reset' : 'Cancel'}
         </Button>
-        <Button className="w-full" onClick={onFileSubmission} variant={file ? 'default' : 'disabled'}>
+        <Button className="w-full" onClick={onFileSubmission} variant={file && !isUploading ? 'default' : 'disabled'}>
           Submit
         </Button>
       </div>
