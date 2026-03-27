@@ -1,6 +1,6 @@
 // src/components/SignupForm.tsx
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Import the custom auth hook
+import { useAuth } from '../../contexts/AuthContext';
 import { signUp } from '../../api/auth';
 
 const SignupForm = () => {

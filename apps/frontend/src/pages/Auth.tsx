@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import LoginForm from '../components/auth/LoginForm';
 import SignupForm from '../components/auth/SignupForm';
@@ -45,7 +45,8 @@ const Auth = () => {
             >
               Sign In
             </button>
-            <button
+            {/* TODO: remove when Sign Up enabled */}
+            {/* <button
               onClick={() => setAuthMode('signup')}
               className={cn(
                 'flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all',
@@ -55,7 +56,7 @@ const Auth = () => {
               )}
             >
               Sign Up
-            </button>
+            </button> */}
           </div>
 
           {/* Form */}
@@ -64,7 +65,7 @@ const Auth = () => {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-neutral-500 dark:text-neutral-400">
-          <p>© 2024 Creditable. All rights reserved.</p>
+          <p>© 2026 Creditable. All rights reserved.</p>
         </div>
       </div>
     </div>

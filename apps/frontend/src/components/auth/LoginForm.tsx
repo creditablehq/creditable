@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../api/auth';
 import { cn } from '../../../lib/utils';
-import clsx from 'clsx';
 
 const LoginForm = () => {
   const { setToken, setUser } = useAuth();
