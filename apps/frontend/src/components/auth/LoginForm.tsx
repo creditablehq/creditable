@@ -26,33 +26,53 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='flex flex-col gap-4 items-center'>
-      <input
-        type="email"
-        className={cn(clsx('w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600', isFailedLogin ? 'border-red' : ''))}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        className={cn(clsx('w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:bg-neutral-900 dark:text-white dark:border-neutral-600', isFailedLogin ? 'border-red' : ''))}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        required
-      />
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+          Email address
+        </label>
+        <input
+          type="email"
+          id="email"
+          className={cn(
+            'w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-neutral-700 dark:text-white dark:border-neutral-600 dark:focus:ring-blue-400',
+            isFailedLogin ? 'border-red-300 focus:ring-red-500' : 'border-neutral-300 dark:border-neutral-600'
+          )}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+          Password
+        </label>
+        <input
+          type="password"
+          id="password"
+          className={cn(
+            'w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-neutral-700 dark:text-white dark:border-neutral-600 dark:focus:ring-blue-400',
+            isFailedLogin ? 'border-red-300 focus:ring-red-500' : 'border-neutral-300 dark:border-neutral-600'
+          )}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
+          required
+        />
+      </div>
       {
         isFailedLogin &&
-        <span className='content-start text-red-500'>Invalid username or password</span>
+        <div className='text-red-600 dark:text-red-400 text-sm font-medium'>
+          Invalid email or password
+        </div>
       }
       <button
         type="submit"
         disabled={loading}
-        className="bg-brand text-white px-4 py-2 rounded w-40 hover:bg-brand-dark disabled:cursor-progress disabled:border disabled:border-muted-100 disabled:text-muted-100 disabled:dark:border-muted-900 disabled:dark:text-muted-900"
+        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
       >
-        Login
+        {loading ? 'Signing in...' : 'Sign In'}
       </button>
     </form>
   );
