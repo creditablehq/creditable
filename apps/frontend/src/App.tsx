@@ -4,9 +4,7 @@ import { pingBackend } from './api/api'
 import Dashboard from './pages/Dashboard';
 import Layout from './components/layout/Layout';
 import StyleGuide from './pages/StyleGuide';
-import SignupForm from './components/auth/SignupForm';
-import LoginForm from './components/auth/LoginForm';
-import ModalAuthWrapper from './components/auth/ModalAuthWrapper';
+import Auth from './pages/Auth';
 import { Clients } from './routes/Clients';
 import { Brokers } from './routes/Brokers';
 import CompanyDetail from './pages/companies/[companyId]';
@@ -20,19 +18,14 @@ import { updateUser } from './api/user';
 
 const AppContent = () => {
   const { token } = useAuth();
-  const [ showAuthForm, setShowAuthForm ] = useState(false);
   const [ showUserAgreement, setShowUserAgreement ] = useState(true);
-  const [ authMode, setAuthMode ] = useState<'signup' | 'login'>('login');
   const [ ping, setPing ] = useState<string | null>(null);
 
   const auth = useContext(AuthContext);
   const { setToken, setUser } = useAuth();
 
   useEffect(() => {
-    if (!token) {
-      setShowAuthForm(true);
-    } else {
-      setShowAuthForm(false);
+    if (token) {
       setShowUserAgreement(!auth?.user?.hasConsentedUserAgreement);
     }
     pingBackend()
@@ -50,17 +43,13 @@ const AppContent = () => {
       .catch(e => { console.error("Error accpeting user agreement", e)});
   }
 
+  if (!token) {
+    return <Auth />;
+  }
+
   return (
     <div className="min-h-screen bg-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
-      {showAuthForm ? (
-        <ModalAuthWrapper
-          title={authMode === 'signup' ? 'Sign Up' : 'Log In'}
-          // switchModeLabel={authMode === 'signup' ? 'Already have an account? Log In' : 'New user? Sign Up'}
-          onSwitchMode={() => setAuthMode(authMode === 'signup' ? 'login' : 'signup')}
-        >
-          {authMode === 'signup' ? <SignupForm /> : <LoginForm />}
-        </ModalAuthWrapper>
-      ) : showUserAgreement ? (
+      {showUserAgreement ? (
         <UserAgreementModal onClose={handleCloseUserAgreement} />
       ) : (
         <Router>
