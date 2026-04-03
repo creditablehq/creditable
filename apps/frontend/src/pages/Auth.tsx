@@ -65,7 +65,7 @@ const Auth = () => {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-neutral-500 dark:text-neutral-400">
-          <p>Not a member? <a href="https://joincreditable.com/book-a-demo" target="_blank">Book a demo!</a></p>
+          <p>Not a member? <a href="https://joincreditable.com/book-a-demo#contact" target="_blank">Book a demo!</a></p>
           <p>© 2026 Creditable. All rights reserved.</p>
         </div>
       </div>
