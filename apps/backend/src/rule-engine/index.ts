@@ -53,14 +53,16 @@ export interface ActuarialAssumptions {
   rxDeductibleAllocation: number;
 }
 
+export interface CMS {
+  cmsDeductible: number;
+  cmsMoop: number;
+  cmsAVThreshold: number;
+  targetGrossCost: number;
+}
+
 export interface ActuarialConstants {
-  planYear: 2024 | 2025 | 2026;
-  CMS: {
-    cmsDeductible: number;
-    cmsMoop: number;
-    cmsAVThreshold: number;
-    targetGrossCost: number;
-  };
+  planYear: 2024 | 2025 | 2026 | 2027;
+  CMS: CMS;
   ActuarialAssumptions: {
     t1Utilization: number;
     t2Utilization: number;
@@ -97,7 +99,43 @@ const defaultActuarialConstants: ActuarialConstants = {
   } as ActuarialAssumptions,
 };
 
-const ACTUARIAL_COVERAGE_EXPECTATION = 0.72;
+// Year-indexed CMS configurations
+const cmsByYear: Record<number, CMS> = {
+  2024: {
+    cmsDeductible: 610,
+    cmsMoop: 2100,
+    cmsAVThreshold: 0.72,
+    targetGrossCost: 5500,
+  },
+  2025: {
+    cmsDeductible: 610,
+    cmsMoop: 2100,
+    cmsAVThreshold: 0.72,
+    targetGrossCost: 5500,
+  },
+  2026: {
+    cmsDeductible: 610,
+    cmsMoop: 2100,
+    cmsAVThreshold: 0.72,
+    targetGrossCost: 5500,
+  },
+  2027: {
+    cmsDeductible: 610,
+    cmsMoop: 2100,
+    cmsAVThreshold: 0.73,
+    targetGrossCost: 5500,
+  },
+};
+
+function getCMSByYear(year: number): CMS {
+  const cms = cmsByYear[year];
+  if (!cms) {
+    throw new Error(
+      `No CMS configuration found for plan year ${year}. Supported years: ${Object.keys(cmsByYear).join(', ')}`
+    );
+  }
+  return cms;
+}
 
 export function evaluatePlan(
   plan: PlanInput,
@@ -131,11 +169,12 @@ function evaluateActuarial(
   plan: PlanInput,
   assumptions: ActuarialAssumptions
 ): EvaluationResult {
+  const cms = getCMSByYear(plan.year);
   const grossCost = calculateGrossCost(assumptions);
   const planPays = calculatePlanPays(grossCost, plan, assumptions);
   const actuarialPercentage = planPays / grossCost;
 
-  const isCreditable = actuarialPercentage >= ACTUARIAL_COVERAGE_EXPECTATION;
+  const isCreditable = actuarialPercentage >= cms.cmsAVThreshold;
 
   console.log(
     `Calculated AV %: ${actuarialPercentage}\nPlan Pays: ${planPays}\nGross Cost: ${grossCost}`
@@ -148,8 +187,8 @@ function evaluateActuarial(
     actuarialAssumptions: assumptions,
     isCreditable,
     reasoning: isCreditable
-      ? 'Plan meets actuarial requirements (≥72%).'
-      : 'Plan fails actuarial requirement (<72%).',
+      ? `Plan meets actuarial requirements (≥${cms.cmsAVThreshold * 100}%).`
+      : `Plan fails actuarial requirement (<${cms.cmsAVThreshold * 100}%).`,
   };
 }
 
