@@ -5,8 +5,8 @@ export interface PlanFormData {
   name: string;
   year: number;
   type: 'STANDARD' | 'HIGH_DEDUCTIBLE';
-  deductible: number;
-  moop: number;
+  deductible?: number;
+  moop?: number;
   integratedDeductible: boolean;
 
   t1CostSharingType: 'COPAY' | 'COINSURANCE';
@@ -14,20 +14,20 @@ export interface PlanFormData {
   t3CostSharingType: 'COPAY' | 'COINSURANCE';
   t4CostSharingType: 'COPAY' | 'COINSURANCE';
 
-  t1ShareValue: number;
-  t2ShareValue: number;
-  t3ShareValue: number;
-  t4ShareValue: number;
+  t1ShareValue?: number;
+  t2ShareValue?: number;
+  t3ShareValue?: number;
+  t4ShareValue?: number;
 
   t1UsesDeductible: boolean;
   t2UsesDeductible: boolean;
   t3UsesDeductible: boolean;
   t4UsesDeductible: boolean;
 
-  t1CapValue: number;
-  t2CapValue: number;
-  t3CapValue: number;
-  t4CapValue: number;
+  t1CapValue?: number;
+  t2CapValue?: number;
+  t3CapValue?: number;
+  t4CapValue?: number;
 
   evaluationMethod: 'ACTUARIAL' | 'SIMPLIFIED';
 

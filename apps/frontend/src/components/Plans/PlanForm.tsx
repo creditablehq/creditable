@@ -20,8 +20,8 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
     name: '',
     year: new Date().getFullYear() + 1,
     type: 'STANDARD',
-    deductible: 0,
-    moop: 0,
+    deductible: undefined,
+    moop: undefined,
     integratedDeductible: false,
 
     t1CostSharingType: 'COPAY',
@@ -29,20 +29,20 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
     t3CostSharingType: 'COPAY',
     t4CostSharingType: 'COPAY',
 
-    t1ShareValue: 0,
-    t2ShareValue: 0,
-    t3ShareValue: 0,
-    t4ShareValue: 0,
+    t1ShareValue: undefined,
+    t2ShareValue: undefined,
+    t3ShareValue: undefined,
+    t4ShareValue: undefined,
 
     t1UsesDeductible: false,
     t2UsesDeductible: false,
     t3UsesDeductible: false,
     t4UsesDeductible: false,
 
-    t1CapValue: 0,
-    t2CapValue: 0,
-    t3CapValue: 0,
-    t4CapValue: 0,
+    t1CapValue: undefined,
+    t2CapValue: undefined,
+    t3CapValue: undefined,
+    t4CapValue: undefined,
 
     evaluationMethod: 'ACTUARIAL',
     actuarialAssumptions: {} as ActuarialAssumptionsInput,
@@ -51,6 +51,26 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
   const [loading, setLoading] = useState(false);
   const [isActuarialAssumtionsModalOpen, setActuarialAssumptionsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const normalizeNumericInput = (value: string, isPercentage = false) => {
+    if (isPercentage) {
+      const parsed = parseInt(value, 10);
+      if (Number.isNaN(parsed)) {
+        return 0;
+      }
+      return Number((parsed / 100).toFixed(4));
+    }
+
+    const parsed = parseFloat(value);
+    if (Number.isNaN(parsed)) {
+      return 0;
+    }
+
+    return Number(parsed.toFixed(4));
+  };
+
+  const formatShareValueForInput = (value: number, isPercentage: boolean) =>
+    isPercentage ? Number((value * 100).toFixed(0)) : value;
 
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -82,6 +102,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
             <Input
               id="year"
               type="number"
+              placeholder="0"
               step="1"
               min={new Date().getFullYear()}
               value={form.year}
@@ -103,6 +124,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
             <Input
               id="deductible"
               type="number"
+              placeholder="0"
               step="1"
               value={form.deductible}
               onChange={(e) => handleChange('deductible', parseFloat(e.target.value))}
@@ -112,6 +134,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
             <Input
               id="moop"
               type="number"
+              placeholder="0"
               step="1"
               value={form.moop}
               onChange={(e) => handleChange('moop', parseFloat(e.target.value))}
@@ -140,11 +163,21 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                     <Input
                       id={`t${tier}ShareValue`}
                       type="number"
+                      placeholder="0"
                       step="1"
                       min="0"
-                      value={(form[`t${tier}ShareValue` as keyof PlanFormData] as number) * (form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? 100 : 1)}
+                      value={formatShareValueForInput(
+                        form[`t${tier}ShareValue` as keyof PlanFormData] as number,
+                        form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE'
+                      )}
                       onChange={(e) =>
-                        handleChange(`t${tier}ShareValue` as keyof PlanFormData, parseFloat(e.target.value) / (form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? 100 : 1))
+                        handleChange(
+                          `t${tier}ShareValue` as keyof PlanFormData,
+                          normalizeNumericInput(
+                            e.target.value,
+                            form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE'
+                          )
+                        )
                       }
                       unit={form[`t${tier}CostSharingType` as keyof PlanFormData] === 'COINSURANCE' ? '%' : ''}
                     />
@@ -153,6 +186,7 @@ export function PlanForm({ companyId, onPlanCreated }: PlanFormProps) {
                     <Input
                       id={`t${tier}CapValue`}
                       type="number"
+                      placeholder="0"
                       step="1"
                       value={form[`t${tier}CapValue` as keyof PlanFormData] as number}
                       onChange={(e) =>
