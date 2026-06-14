@@ -131,7 +131,9 @@ function getCMSByYear(year: number): CMS {
   const cms = cmsByYear[year];
   if (!cms) {
     throw new Error(
-      `No CMS configuration found for plan year ${year}. Supported years: ${Object.keys(cmsByYear).join(', ')}`
+      `No CMS configuration found for plan year ${year}. Supported years: ${Object.keys(
+        cmsByYear
+      ).join(', ')}`
     );
   }
   return cms;
@@ -272,19 +274,71 @@ function calculateTierMemberCosts(
 
   const gross = fills.map((f, i) => f * costs[i]);
 
+  // Start with effective Rx deductible (allocated if integrated)
   let remainingDed = plan.integratedDeductible
     ? plan.deductible * a.rxDeductibleAllocation
     : plan.deductible;
 
-  remainingDed = propagateDeductibleThroughTiers(
-    plan,
-    fills,
-    gross,
-    remainingDed
-  );
+  const memberCosts: number[] = [];
 
-  console.log(`Remaining Ded: ${remainingDed}`);
+  // Compute tiers 1..3 sequentially, consuming remainingDed as we go
+  for (let i = 0; i < 3; i++) {
+    const tierIndex = i;
+    const tier = i + 1;
 
+    const usesDedKey = `t${tier}UsesDeductible` as keyof PlanInput;
+    const costTypeKey = `t${tier}CostSharingType` as keyof PlanInput;
+    const shareValueKey = `t${tier}ShareValue` as keyof PlanInput;
+
+    const usesDed = plan[usesDedKey] as boolean;
+    const shareType = plan[costTypeKey] as 'COPAY' | 'COINSURANCE';
+    const shareValue = plan[shareValueKey] as number;
+
+    const fills_i = fills[i];
+    const gross_i = gross[i];
+    const costPerFill = costs[i];
+
+    let memberPays = 0;
+
+    if (!usesDed) {
+      // No deductible: simple copay or coinsurance
+      if (shareType === 'COPAY') {
+        memberPays = fills_i * shareValue;
+      } else {
+        memberPays = gross_i * shareValue;
+      }
+    } else {
+      // Tier is subject to deductible; apply remainingDed sequentially
+      if (remainingDed >= gross_i) {
+        // Deductible fully absorbs this tier
+        memberPays = gross_i;
+        remainingDed -= gross_i;
+      } else {
+        // Partial deductible applies
+        const dedApplied = Math.min(remainingDed, gross_i);
+        remainingDed -= dedApplied;
+        const residual = gross_i - dedApplied;
+
+        if (shareType === 'COPAY') {
+          // For copay: some fills absorbed by deductible, remaining fills pay copay
+          const fillsAbsorbed = costPerFill > 0 ? dedApplied / costPerFill : 0;
+          const remainingFills = Math.max(0, fills_i - fillsAbsorbed);
+          const copayAmount = remainingFills * shareValue;
+          memberPays = dedApplied + copayAmount;
+        } else {
+          // Coinsurance on residual
+          const coinsUncapped = residual * shareValue;
+          memberPays = dedApplied + coinsUncapped;
+        }
+      }
+    }
+
+    memberCosts.push(memberPays);
+  }
+
+  console.log(`Remaining Ded after T1-T3: ${remainingDed}`);
+
+  // Tier 4 uses whatever remainingDed is left after tiers 1-3
   const t4MemberPays = calculateTier4MemberCost(
     plan,
     fills[3],
@@ -293,83 +347,11 @@ function calculateTierMemberCosts(
     remainingDed
   );
 
-  const t1 = calculateTierMemberCost(
-    plan,
-    fills[0],
-    gross[0],
-    plan.t1UsesDeductible,
-    0
-  );
-  const t2 = calculateTierMemberCost(
-    plan,
-    fills[1],
-    gross[1],
-    plan.t2UsesDeductible,
-    1
-  );
-  const t3 = calculateTierMemberCost(
-    plan,
-    fills[2],
-    gross[2],
-    plan.t3UsesDeductible,
-    2
-  );
-
   console.log(
-    `T1 Member Cost: ${t1}\nT2 Member Pays: ${t2}\nT3 Member Pays: ${t3}\nT4 Member Pays: ${t4MemberPays}`
+    `T1 Member Cost: ${memberCosts[0]}\nT2 Member Pays: ${memberCosts[1]}\nT3 Member Pays: ${memberCosts[2]}\nT4 Member Pays: ${t4MemberPays}`
   );
 
-  return [t1, t2, t3, t4MemberPays];
-}
-
-function propagateDeductibleThroughTiers(
-  plan: PlanInput,
-  fills: number[],
-  gross: number[],
-  ded: number
-): number {
-  if (plan.t1UsesDeductible) {
-    const t1Consumed = Math.min(gross[0], ded);
-    ded -= t1Consumed;
-  }
-
-  if (plan.t2UsesDeductible) {
-    const t2Consumed = Math.min(gross[1], ded);
-    ded -= t2Consumed;
-  }
-
-  if (plan.t3UsesDeductible) {
-    const t3Consumed = Math.min(gross[2], ded);
-    ded -= t3Consumed;
-  }
-
-  return ded;
-}
-
-function calculateTierMemberCost(
-  plan: PlanInput,
-  fills: number,
-  gross: number,
-  usesDed: boolean,
-  tierIndex: number
-): number {
-  const tier = tierIndex + 1;
-
-  const tnCostShareTypeKey = `t${tier}CostSharingType` as keyof PlanInput;
-  const tnShareValueKey = `t${tier}ShareValue` as keyof PlanInput;
-
-  const shareType = plan[tnCostShareTypeKey] as 'COPAY' | 'COINSURANCE';
-  const shareValue = plan[tnShareValueKey] as number;
-
-  if (usesDed) {
-    return Math.min(gross, plan.deductible);
-  }
-
-  if (shareType === 'COPAY') {
-    return fills * shareValue;
-  }
-
-  return gross * shareValue;
+  return [memberCosts[0], memberCosts[1], memberCosts[2], t4MemberPays];
 }
 
 function calculateTier4MemberCost(
